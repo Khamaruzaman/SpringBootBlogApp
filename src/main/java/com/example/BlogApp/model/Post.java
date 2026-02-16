@@ -16,7 +16,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BlogPost {
+public class Post {
     @Id
     private UUID id;
 
