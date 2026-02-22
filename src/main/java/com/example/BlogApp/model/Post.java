@@ -19,19 +19,13 @@ import java.util.UUID;
 public class Post {
     @Id
     private UUID id;
-
     private String title;
-
     private String content;
 
-    // store reference to author id (UUID) to avoid embedding full user
     @Field("authorId")
     private UUID authorId;
-
     private List<String> tags;
-
     private long views;
-
     private boolean published;
 
     @CreatedDate

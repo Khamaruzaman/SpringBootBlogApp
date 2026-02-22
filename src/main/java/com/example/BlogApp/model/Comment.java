@@ -18,7 +18,6 @@ import java.util.UUID;
 public class Comment {
     @Id
     private UUID id;
-
     private String content;
 
     @Field("authorId")

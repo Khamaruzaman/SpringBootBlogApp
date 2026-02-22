@@ -7,5 +7,5 @@ import java.util.UUID;
 
 public interface CommentRepo extends MongoRepository<Comment, UUID> {
     Comment findByPostId(UUID postId);
-    Comment findByAuthor(String author);
+    Comment findByAuthorId(UUID authorId);
 }

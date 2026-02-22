@@ -7,6 +7,6 @@ import java.util.UUID;
 
 public interface PostRepo extends MongoRepository<Post, UUID> {
     Post findByTitleContaining(String title);
-    Post findByAuthor(String author);
+    Post findByAuthorId(UUID authorId);
     Post findByPublishedTrue(boolean published);
 }
