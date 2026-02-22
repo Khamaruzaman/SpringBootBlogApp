@@ -72,19 +72,19 @@ A Spring Boot RESTful Blog Application with MongoDB as the database and JWT (JSO
   - updatedAt
 
 #### Task 2.2: Create MongoDB Repositories
-- [ ] Create `UserRepository` extending MongoRepository
+- [x] Create `UserRepository` extending MongoRepository
   - findByUsername()
   - findByEmail()
   - existsByUsername()
   - existsByEmail()
 
-- [ ] Create `BlogPostRepository` extending MongoRepository
+- [x] Create `BlogPostRepository` extending MongoRepository
   - findByAuthor()
   - findByPublishedTrue()
   - findByTitleContaining()
   - Custom pagination queries
 
-- [ ] Create `CommentRepository` extending MongoRepository
+- [x] Create `CommentRepository` extending MongoRepository
   - findByPost()
   - findByAuthor()
 
