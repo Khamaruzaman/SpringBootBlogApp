@@ -93,7 +93,7 @@ A Spring Boot RESTful Blog Application with MongoDB as the database and JWT (JSO
 ### **Phase 3: Security & Authentication**
 
 #### Task 3.1: Create JWT Utilities
-- [ ] Create `JwtTokenProvider` class
+- [x] Create `JwtTokenProvider` class
   - generateToken(UserDetails) - Create JWT tokens
   - getClaimsFromToken(String token) - Extract claims
   - validateToken(String token) - Validate token signature and expiration
@@ -101,23 +101,23 @@ A Spring Boot RESTful Blog Application with MongoDB as the database and JWT (JSO
   - getExpirationDateFromToken(String token) - Get expiration date
 
 #### Task 3.2: Create Custom Security Configuration
-- [ ] Create `SecurityConfig` class extending WebSecurityConfigurerAdapter
+- [x] Create `SecurityConfig` class extending WebSecurityConfigurerAdapter
   - Configure HttpSecurity for stateless authentication
   - Disable CSRF (since using JWT)
   - Set session management to STATELESS
   - Configure filter chain order
 
-- [ ] Create JWT Authentication Filter
+- [x] Create JWT Authentication Filter
   - Extract token from Authorization header
   - Validate token
   - Set authentication in SecurityContext
 
-- [ ] Create JWT Authentication Entry Point
+- [x] Create JWT Authentication Entry Point
   - Handle unauthorized access (401)
   - Return proper error response
 
 #### Task 3.3: Create Custom User Details Service
-- [ ] Create `UserDetailsService` implementation
+- [x] Create `UserDetailsService` implementation
   - loadUserByUsername(String username)
   - Load user from MongoDB
   - Build UserDetails with authorities/roles
@@ -405,8 +405,8 @@ Phase 10: Configuration & Deployment
 Use this checklist to track progress:
 
 - [x] Phase 1 Complete
-- [ ] Phase 2 Complete
-- [ ] Phase 3 Complete
+- [x] Phase 2 Complete
+- [x] Phase 3 Complete
 - [ ] Phase 4 Complete
 - [ ] Phase 5 Complete
 - [ ] Phase 6 Complete

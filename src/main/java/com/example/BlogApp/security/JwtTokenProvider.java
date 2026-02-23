@@ -1,4 +1,4 @@
-package com.example.BlogApp.Jwt;
+package com.example.BlogApp.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;

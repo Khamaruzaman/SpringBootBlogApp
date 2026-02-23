@@ -1,4 +1,4 @@
-package com.example.BlogApp.Jwt;
+package com.example.BlogApp.security;
 
 import lombok.Getter;
 import lombok.Setter;
