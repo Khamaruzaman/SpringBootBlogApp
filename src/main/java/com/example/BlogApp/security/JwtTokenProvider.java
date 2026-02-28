@@ -1,7 +1,6 @@
 package com.example.BlogApp.security;
 
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +42,7 @@ public class JwtTokenProvider {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtProperties.getExpirationMs());
 
-        SecretKey key = Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes());
+        SecretKey key = getSignInKey();
 
         return Jwts.builder()
                 .subject(userDetails.getUsername())
@@ -158,13 +157,10 @@ public class JwtTokenProvider {
     }
 
     /**
-     * Decode the base64-encoded secret from configuration and create the HMAC key
-     * used for signing and verifying JWTs.
-     *
-     * @return a {@link SecretKey} derived from the configured base64 secret
+     * Create HMAC signing key from the configured secret.
+     * This uses the plain secret bytes (the default dev secret is plain text).
      */
     private SecretKey getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(jwtProperties.getSecret());
-        return Keys.hmacShaKeyFor(keyBytes);
+        return Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes());
     }
 }

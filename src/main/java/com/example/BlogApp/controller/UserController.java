@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 @AllArgsConstructor
 @RestController
@@ -24,5 +25,14 @@ public class UserController {
     public User register(@RequestBody User user) {
         userService.saveUser(user);
         return user;
+    }
+
+    @PostMapping("/login")
+    public Map<String, String> login(@RequestBody User user) {
+        return Map.of(
+                "token", userService.varifyUser(user),
+                "username", user.getUsername(),
+                "type", "Bearer"
+        );
     }
 }
