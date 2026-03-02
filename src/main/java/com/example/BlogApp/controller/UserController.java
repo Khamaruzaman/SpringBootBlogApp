@@ -1,5 +1,6 @@
 package com.example.BlogApp.controller;
 
+import com.example.BlogApp.DTO.JwtAuthenticationResponse;
 import com.example.BlogApp.DTO.LoginRequest;
 import com.example.BlogApp.DTO.RegisterRequest;
 import com.example.BlogApp.model.User;
@@ -12,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 
 import java.util.List;
-import java.util.Map;
 
 @AllArgsConstructor
 @RestController
@@ -30,11 +30,10 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public Map<String, String> login(@RequestBody LoginRequest loginRequest) {
-        return Map.of(
-                "token", userService.varifyUser(loginRequest),
-                "username", loginRequest.getUsername(),
-                "type", "Bearer"
-        );
+    public JwtAuthenticationResponse login(@RequestBody LoginRequest loginRequest) {
+        JwtAuthenticationResponse response = new JwtAuthenticationResponse();
+        response.setAccessToken(userService.varifyUser(loginRequest));
+        response.setUsername(loginRequest.getUsername());
+        return response;
     }
 }
