@@ -1,5 +1,6 @@
 package com.example.BlogApp.service;
 
+import com.example.BlogApp.DTO.LoginRequest;
 import com.example.BlogApp.model.User;
 import com.example.BlogApp.repo.UserRepo;
 import com.example.BlogApp.security.JwtTokenProvider;
@@ -34,11 +35,11 @@ public class UserService {
         return userRepo.findAll().stream().map(User::getUsername).toList();
     }
 
-    public String varifyUser(@NonNull User user) {
+    public String varifyUser(@NonNull LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword())
+                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
         );
-        UserDetails userDetails = myUserDetailsService.loadUserByUsername(user.getUsername());
+        UserDetails userDetails = myUserDetailsService.loadUserByUsername(loginRequest.getUsername());
         return authentication.isAuthenticated() ? jwtTokenProvider.generateToken(userDetails) : "Authentication Failed";
     }
 }

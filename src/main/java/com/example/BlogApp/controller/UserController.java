@@ -1,5 +1,6 @@
 package com.example.BlogApp.controller;
 
+import com.example.BlogApp.DTO.LoginRequest;
 import com.example.BlogApp.model.User;
 import com.example.BlogApp.service.UserService;
 import lombok.AllArgsConstructor;
@@ -28,10 +29,10 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public Map<String, String> login(@RequestBody User user) {
+    public Map<String, String> login(@RequestBody LoginRequest loginRequest) {
         return Map.of(
-                "token", userService.varifyUser(user),
-                "username", user.getUsername(),
+                "token", userService.varifyUser(loginRequest),
+                "username", loginRequest.getUsername(),
                 "type", "Bearer"
         );
     }
