@@ -1,6 +1,7 @@
 package com.example.BlogApp.controller;
 
 import com.example.BlogApp.DTO.LoginRequest;
+import com.example.BlogApp.DTO.RegisterRequest;
 import com.example.BlogApp.model.User;
 import com.example.BlogApp.service.UserService;
 import lombok.AllArgsConstructor;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
 
 import java.util.List;
 import java.util.Map;
@@ -23,9 +25,8 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public User register(@RequestBody User user) {
-        userService.saveUser(user);
-        return user;
+    public User register(@Valid @RequestBody RegisterRequest registerRequest) {
+        return userService.saveUser(registerRequest);
     }
 
     @PostMapping("/login")

@@ -1,6 +1,7 @@
 package com.example.BlogApp.service;
 
 import com.example.BlogApp.DTO.LoginRequest;
+import com.example.BlogApp.DTO.RegisterRequest;
 import com.example.BlogApp.model.User;
 import com.example.BlogApp.repo.UserRepo;
 import com.example.BlogApp.security.JwtTokenProvider;
@@ -15,6 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 @AllArgsConstructor
@@ -26,9 +28,14 @@ public class UserService {
     private MyUserDetailsService myUserDetailsService;
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public void saveUser(@NonNull User user) {
-        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+    public User saveUser(@NonNull RegisterRequest registerRequest) {
+        User user = new User();
+        user.setUsername(registerRequest.getUsername());
+        user.setEmail(registerRequest.getEmail());
+        user.setPassword(bCryptPasswordEncoder.encode(registerRequest.getPassword()));
+        user.setRoles(Set.of("USER"));
         userRepo.save(user);
+        return user;
     }
 
     public List<String> findAll() {
