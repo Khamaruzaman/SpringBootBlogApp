@@ -1,6 +1,5 @@
 package com.example.BlogApp.utils;
 
-import com.example.BlogApp.exception.FieldsMismatchException;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.beans.BeanWrapperImpl;
@@ -28,9 +27,13 @@ public class FieldsValueMatchValidator implements ConstraintValidator<FieldsValu
         }
 
         if (!isValid) {
-            throw new FieldsMismatchException(message, field, fieldMatch);
+            // attach the violation to the fieldMatch property so the response is clearer
+            context.disableDefaultConstraintViolation();
+            context.buildConstraintViolationWithTemplate(message)
+                    .addPropertyNode(fieldMatch)
+                    .addConstraintViolation();
         }
 
-        return true;
+        return isValid;
     }
 }

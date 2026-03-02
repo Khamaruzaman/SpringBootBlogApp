@@ -17,14 +17,6 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(FieldsMismatchException.class)
-    public ResponseEntity<Map<String, Object>> handleFieldsMismatchException(FieldsMismatchException ex) {
-        Map<String, Object> errorDetails = new HashMap<>();
-        errorDetails.put("field", ex.getField());
-        errorDetails.put("fieldMatch", ex.getFieldMatch());
-
-        return buildResponse(HttpStatus.BAD_REQUEST, "Fields Mismatch", ex.getMessage(), errorDetails);
-    }
 
     @ExceptionHandler(DuplicateKeyException.class)
     public ResponseEntity<Map<String, Object>> handleDuplicateKeyException(DuplicateKeyException ex) {
