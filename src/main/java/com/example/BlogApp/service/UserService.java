@@ -42,11 +42,22 @@ public class UserService {
         return userRepo.findAll().stream().map(User::getUsername).toList();
     }
 
-    public String varifyUser(@NonNull LoginRequest loginRequest) {
+    public String verifyUser(@NonNull LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
         );
-        UserDetails userDetails = myUserDetailsService.loadUserByUsername(loginRequest.getUsername());
-        return authentication.isAuthenticated() ? jwtTokenProvider.generateToken(userDetails) : "Authentication Failed";
+        return authentication.isAuthenticated() ? generateTokenForUser(loginRequest.getUsername()) : "Authentication Failed";
+    }
+
+    /**
+     * Generate JWT token for a given user
+     * Used when registering a new user to immediately provide authentication
+     *
+     * @param username the username to generate token for
+     * @return JWT token string
+     */
+    public String generateTokenForUser(@NonNull String username) {
+        UserDetails userDetails = myUserDetailsService.loadUserByUsername(username);
+        return jwtTokenProvider.generateToken(userDetails);
     }
 }
