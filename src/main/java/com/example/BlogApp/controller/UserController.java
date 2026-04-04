@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public class UserController {
     UserService userService;
 
     @GetMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<AuthResponse<List<UserDTO>>> getAllUsers() {
         try {
             AuthResponse<List<UserDTO>> response = new AuthResponse<>();
@@ -37,6 +39,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
+    @PreAuthorize("hasAuthority('ADMIN') or #userId == authentication.principal.user.id")
     public ResponseEntity<AuthResponse<UserDTO>> getUserById(@PathVariable UUID userId) {
         try {
             AuthResponse<UserDTO> response = new AuthResponse<>();
@@ -54,6 +57,7 @@ public class UserController {
     }
 
     @GetMapping("/username/{username}")
+    @PreAuthorize("hasAuthority('ADMIN') or #username == authentication.principal.user.username")
     public ResponseEntity<AuthResponse<UserDTO>> getUserByUsername(@PathVariable String username) {
         try {
             AuthResponse<UserDTO> response = new AuthResponse<>();
@@ -71,6 +75,7 @@ public class UserController {
     }
 
     @PutMapping("/{userId}")
+    @PreAuthorize("hasAuthority('ADMIN') or #userId == authentication.principal.user.id")
     public ResponseEntity<AuthResponse<UserDTO>> updateUserProfile(@PathVariable UUID userId, @Valid @RequestBody UpdateUserRequest request) {
         try {
             AuthResponse<UserDTO> response = new AuthResponse<>();
@@ -88,6 +93,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
+    @PreAuthorize("hasAuthority('ADMIN') or #userId == authentication.principal.user.id")
     public ResponseEntity<AuthResponse<Void>> deleteUser(@PathVariable UUID userId) {
         try {
             userService.deleteUser(userId);
