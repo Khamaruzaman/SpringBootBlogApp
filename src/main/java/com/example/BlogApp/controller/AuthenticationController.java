@@ -5,7 +5,7 @@ import com.example.BlogApp.DTO.JwtAuthenticationResponse;
 import com.example.BlogApp.DTO.LoginRequest;
 import com.example.BlogApp.DTO.RegisterRequest;
 import com.example.BlogApp.model.User;
-import com.example.BlogApp.service.UserService;
+import com.example.BlogApp.service.AuthenticationService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 public class AuthenticationController {
 
-    private UserService userService;
+    private AuthenticationService authenticationService;
 
     /**
      * Register a new user
@@ -39,12 +39,12 @@ public class AuthenticationController {
     public ResponseEntity<AuthResponse<JwtAuthenticationResponse>> register(
             @Valid @RequestBody RegisterRequest registerRequest) {
         try {
-            if (!userService.userExists(registerRequest)) {
-                User savedUser = userService.saveUser(registerRequest);
+            if (!authenticationService.userExists(registerRequest)) {
+                User savedUser = authenticationService.saveUser(registerRequest);
 
                 // Generate JWT token for the newly registered user
                 JwtAuthenticationResponse jwtResponse = new JwtAuthenticationResponse();
-                jwtResponse.setAccessToken(userService.generateTokenForUser(savedUser.getUsername()));
+                jwtResponse.setAccessToken(authenticationService.generateTokenForUser(savedUser.getUsername()));
                 jwtResponse.setUsername(savedUser.getUsername());
                 jwtResponse.setTokenType("Bearer");
 
@@ -82,7 +82,7 @@ public class AuthenticationController {
     public ResponseEntity<AuthResponse<JwtAuthenticationResponse>> login(
             @Valid @RequestBody LoginRequest loginRequest) {
         try {
-            String token = userService.verifyUser(loginRequest);
+            String token = authenticationService.verifyUser(loginRequest);
 
             if ("Authentication Failed".equals(token)) {
                 AuthResponse<JwtAuthenticationResponse> errorResponse = new AuthResponse<>();
@@ -114,4 +114,3 @@ public class AuthenticationController {
         }
     }
 }
-
