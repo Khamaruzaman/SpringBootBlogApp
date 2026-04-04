@@ -1,9 +1,9 @@
 package com.example.BlogApp.controller;
 
 import com.example.BlogApp.DTO.AuthResponse;
-import com.example.BlogApp.DTO.JwtAuthenticationResponse;
-import com.example.BlogApp.DTO.LoginRequest;
-import com.example.BlogApp.DTO.RegisterRequest;
+import com.example.BlogApp.DTO.authDTO.JwtAuthenticationResponse;
+import com.example.BlogApp.DTO.authDTO.LoginRequest;
+import com.example.BlogApp.DTO.authDTO.RegisterRequest;
 import com.example.BlogApp.model.User;
 import com.example.BlogApp.service.AuthenticationService;
 import jakarta.validation.Valid;

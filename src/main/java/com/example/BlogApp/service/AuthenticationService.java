@@ -1,7 +1,7 @@
 package com.example.BlogApp.service;
 
-import com.example.BlogApp.DTO.LoginRequest;
-import com.example.BlogApp.DTO.RegisterRequest;
+import com.example.BlogApp.DTO.authDTO.LoginRequest;
+import com.example.BlogApp.DTO.authDTO.RegisterRequest;
 import com.example.BlogApp.model.User;
 import com.example.BlogApp.repo.UserRepo;
 import com.example.BlogApp.security.JwtTokenProvider;
