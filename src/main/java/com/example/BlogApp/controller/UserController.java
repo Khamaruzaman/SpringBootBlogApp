@@ -1,15 +1,17 @@
 package com.example.BlogApp.controller;
 
 import com.example.BlogApp.DTO.AuthResponse;
+import com.example.BlogApp.DTO.userDTO.UpdateUserRequest;
+import com.example.BlogApp.DTO.userDTO.UserDTO;
 import com.example.BlogApp.service.UserService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @AllArgsConstructor
 @RestController
@@ -18,20 +20,88 @@ public class UserController {
     UserService userService;
 
     @GetMapping
-    public ResponseEntity<AuthResponse<List<String>>> getUsers() {
+    public ResponseEntity<AuthResponse<List<UserDTO>>> getAllUsers() {
         try {
-            AuthResponse<List<String>> response = new AuthResponse<>();
+            AuthResponse<List<UserDTO>> response = new AuthResponse<>();
             response.setSuccess(true);
             response.setMessage("Users retrieved successfully");
-            response.setData(userService.findAll());
+            response.setData(userService.getAllUsers());
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {
-            AuthResponse<List<String>> response = new AuthResponse<>();
+            AuthResponse<List<UserDTO>> response = new AuthResponse<>();
             response.setSuccess(false);
             response.setMessage("Users retrieved failed: " + e.getMessage());
+            response.setData(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    @GetMapping("/{userId}")
+    public ResponseEntity<AuthResponse<UserDTO>> getUserById(@PathVariable UUID userId) {
+        try {
+            AuthResponse<UserDTO> response = new AuthResponse<>();
+            response.setSuccess(true);
+            response.setMessage("User retrieved successfully");
+            response.setData(userService.getUserById(userId));
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (Exception e) {
+            AuthResponse<UserDTO> response = new AuthResponse<>();
+            response.setSuccess(false);
+            response.setMessage("User retrieval failed: " + e.getMessage());
             response.setData(null);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
     }
 
+    @GetMapping("/username/{username}")
+    public ResponseEntity<AuthResponse<UserDTO>> getUserByUsername(@PathVariable String username) {
+        try {
+            AuthResponse<UserDTO> response = new AuthResponse<>();
+            response.setSuccess(true);
+            response.setMessage("User retrieved successfully");
+            response.setData(userService.getUserByUsername(username));
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (Exception e) {
+            AuthResponse<UserDTO> response = new AuthResponse<>();
+            response.setSuccess(false);
+            response.setMessage("User retrieval failed: " + e.getMessage());
+            response.setData(null);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+    }
+
+    @PutMapping("/{userId}")
+    public ResponseEntity<AuthResponse<UserDTO>> updateUserProfile(@PathVariable UUID userId, @Valid @RequestBody UpdateUserRequest request) {
+        try {
+            AuthResponse<UserDTO> response = new AuthResponse<>();
+            response.setSuccess(true);
+            response.setMessage("User profile updated successfully");
+            response.setData(userService.updateUserProfile(userId, request));
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (Exception e) {
+            AuthResponse<UserDTO> response = new AuthResponse<>();
+            response.setSuccess(false);
+            response.setMessage("User profile update failed: " + e.getMessage());
+            response.setData(null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<AuthResponse<Void>> deleteUser(@PathVariable UUID userId) {
+        try {
+            userService.deleteUser(userId);
+            AuthResponse<Void> response = new AuthResponse<>();
+            response.setSuccess(true);
+            response.setMessage("User deleted successfully");
+            response.setData(null);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (Exception e) {
+            AuthResponse<Void> response = new AuthResponse<>();
+            response.setSuccess(false);
+            response.setMessage("User deletion failed: " + e.getMessage());
+            response.setData(null);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+    }
 }
