@@ -28,6 +28,10 @@ public class UserService {
     private MyUserDetailsService myUserDetailsService;
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
+    public boolean userExists(@NonNull RegisterRequest registerRequest) {
+        return userRepo.existsByUsername(registerRequest.getUsername()) || userRepo.existsByEmail(registerRequest.getEmail());
+    }
+
     public User saveUser(@NonNull RegisterRequest registerRequest) {
         User user = new User();
         user.setUsername(registerRequest.getUsername());

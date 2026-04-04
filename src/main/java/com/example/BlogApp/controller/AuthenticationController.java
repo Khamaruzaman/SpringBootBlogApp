@@ -4,7 +4,6 @@ import com.example.BlogApp.DTO.AuthResponse;
 import com.example.BlogApp.DTO.JwtAuthenticationResponse;
 import com.example.BlogApp.DTO.LoginRequest;
 import com.example.BlogApp.DTO.RegisterRequest;
-import com.example.BlogApp.DTO.UserDTO;
 import com.example.BlogApp.model.User;
 import com.example.BlogApp.service.UserService;
 import jakarta.validation.Valid;
@@ -40,20 +39,29 @@ public class AuthenticationController {
     public ResponseEntity<AuthResponse<JwtAuthenticationResponse>> register(
             @Valid @RequestBody RegisterRequest registerRequest) {
         try {
-            User savedUser = userService.saveUser(registerRequest);
+            if (!userService.userExists(registerRequest)) {
+                User savedUser = userService.saveUser(registerRequest);
 
-            // Generate JWT token for the newly registered user
-            JwtAuthenticationResponse jwtResponse = new JwtAuthenticationResponse();
-            jwtResponse.setAccessToken(userService.generateTokenForUser(savedUser.getUsername()));
-            jwtResponse.setUsername(savedUser.getUsername());
-            jwtResponse.setTokenType("Bearer");
+                // Generate JWT token for the newly registered user
+                JwtAuthenticationResponse jwtResponse = new JwtAuthenticationResponse();
+                jwtResponse.setAccessToken(userService.generateTokenForUser(savedUser.getUsername()));
+                jwtResponse.setUsername(savedUser.getUsername());
+                jwtResponse.setTokenType("Bearer");
 
-            AuthResponse<JwtAuthenticationResponse> response = new AuthResponse<>();
-            response.setSuccess(true);
-            response.setMessage("User registered successfully");
-            response.setData(jwtResponse);
+                AuthResponse<JwtAuthenticationResponse> response = new AuthResponse<>();
+                response.setSuccess(true);
+                response.setMessage("User registered successfully");
+                response.setData(jwtResponse);
 
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+                return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            } else {
+                AuthResponse<JwtAuthenticationResponse> errorResponse = new AuthResponse<>();
+                errorResponse.setSuccess(false);
+                errorResponse.setMessage("User with same username or email already exists");
+                errorResponse.setData(null);
+
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+            }
         } catch (Exception e) {
             AuthResponse<JwtAuthenticationResponse> errorResponse = new AuthResponse<>();
             errorResponse.setSuccess(false);
