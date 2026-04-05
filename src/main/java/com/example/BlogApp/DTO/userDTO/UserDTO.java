@@ -1,9 +1,6 @@
 package com.example.BlogApp.DTO.userDTO;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -19,6 +16,7 @@ import java.util.UUID;
 @Setter
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class UserDTO {
     private UUID id;
     private String username;
