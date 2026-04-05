@@ -11,8 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -82,6 +81,7 @@ public class PostController {
     }
 
     @PutMapping("/{postId}")
+    @PreAuthorize("@securityService.isPostAuthor(#postId)")
     public ResponseEntity<AuthResponse<PostDTO>> updatePost(@PathVariable UUID postId, @RequestBody UpdatePostRequest request) {
         try {
             PostDTO updatedPost = postService.updatePost(postId, request);
@@ -97,12 +97,13 @@ public class PostController {
             response.setMessage("Post update failed: " + e.getMessage());
             response.setData(null);
             HttpStatus status = e.getMessage().contains("not found") ? HttpStatus.NOT_FOUND :
-                               e.getMessage().contains("only update") ? HttpStatus.FORBIDDEN : HttpStatus.INTERNAL_SERVER_ERROR;
+                               HttpStatus.INTERNAL_SERVER_ERROR;
             return ResponseEntity.status(status).body(response);
         }
     }
 
     @DeleteMapping("/{postId}")
+    @PreAuthorize("@securityService.canDeletePost(#postId)")
     public ResponseEntity<AuthResponse<Void>> deletePost(@PathVariable UUID postId) {
         try {
             postService.deletePost(postId);
@@ -118,7 +119,7 @@ public class PostController {
             response.setMessage("Post deletion failed: " + e.getMessage());
             response.setData(null);
             HttpStatus status = e.getMessage().contains("not found") ? HttpStatus.NOT_FOUND :
-                               e.getMessage().contains("only delete") ? HttpStatus.FORBIDDEN : HttpStatus.INTERNAL_SERVER_ERROR;
+                               HttpStatus.INTERNAL_SERVER_ERROR;
             return ResponseEntity.status(status).body(response);
         }
     }
@@ -170,6 +171,7 @@ public class PostController {
     }
 
     @PostMapping("/{postId}/publish")
+    @PreAuthorize("@securityService.isPostAuthor(#postId)")
     public ResponseEntity<AuthResponse<PostDTO>> publishPost(@PathVariable UUID postId) {
         try {
             PostDTO publishedPost = postService.publishPost(postId);
@@ -185,12 +187,13 @@ public class PostController {
             response.setMessage("Post publish failed: " + e.getMessage());
             response.setData(null);
             HttpStatus status = e.getMessage().contains("not found") ? HttpStatus.NOT_FOUND :
-                               e.getMessage().contains("only publish") ? HttpStatus.FORBIDDEN : HttpStatus.INTERNAL_SERVER_ERROR;
+                               HttpStatus.INTERNAL_SERVER_ERROR;
             return ResponseEntity.status(status).body(response);
         }
     }
 
     @PostMapping("/{postId}/unpublish")
+    @PreAuthorize("@securityService.isPostAuthor(#postId)")
     public ResponseEntity<AuthResponse<PostDTO>> unpublishPost(@PathVariable UUID postId) {
         try {
             PostDTO unpublishedPost = postService.unpublishPost(postId);
@@ -206,14 +209,8 @@ public class PostController {
             response.setMessage("Post unpublish failed: " + e.getMessage());
             response.setData(null);
             HttpStatus status = e.getMessage().contains("not found") ? HttpStatus.NOT_FOUND :
-                               e.getMessage().contains("only unpublish") ? HttpStatus.FORBIDDEN : HttpStatus.INTERNAL_SERVER_ERROR;
+                               HttpStatus.INTERNAL_SERVER_ERROR;
             return ResponseEntity.status(status).body(response);
         }
-    }
-
-    private String getCurrentUsername() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        assert authentication != null;
-        return authentication.getName();
     }
 }

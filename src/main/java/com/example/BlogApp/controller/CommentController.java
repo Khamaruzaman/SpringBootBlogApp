@@ -7,6 +7,7 @@ import com.example.BlogApp.service.CommentService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -62,6 +63,7 @@ public class CommentController {
     }
 
     @PutMapping("/comments/{commentId}")
+    @PreAuthorize("@securityService.isCommentAuthor(#commentId)")
     public ResponseEntity<AuthResponse<CommentDTO>> updateComment(@PathVariable UUID commentId, @RequestBody CreateCommentRequest request) {
         try {
             CommentDTO updatedComment = commentService.updateComment(commentId, request);
@@ -77,12 +79,13 @@ public class CommentController {
             response.setMessage("Comment update failed: " + e.getMessage());
             response.setData(null);
             HttpStatus status = e.getMessage().contains("not found") ? HttpStatus.NOT_FOUND :
-                               e.getMessage().contains("only update") ? HttpStatus.FORBIDDEN : HttpStatus.INTERNAL_SERVER_ERROR;
+                               HttpStatus.INTERNAL_SERVER_ERROR;
             return ResponseEntity.status(status).body(response);
         }
     }
 
     @DeleteMapping("/comments/{commentId}")
+    @PreAuthorize("@securityService.canDeleteComment(#commentId)")
     public ResponseEntity<AuthResponse<Void>> deleteComment(@PathVariable UUID commentId) {
         try {
             commentService.deleteComment(commentId);
@@ -98,7 +101,7 @@ public class CommentController {
             response.setMessage("Comment deletion failed: " + e.getMessage());
             response.setData(null);
             HttpStatus status = e.getMessage().contains("not found") ? HttpStatus.NOT_FOUND :
-                               e.getMessage().contains("only delete") ? HttpStatus.FORBIDDEN : HttpStatus.INTERNAL_SERVER_ERROR;
+                               HttpStatus.INTERNAL_SERVER_ERROR;
             return ResponseEntity.status(status).body(response);
         }
     }

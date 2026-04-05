@@ -10,7 +10,6 @@ import com.example.BlogApp.repo.PostRepo;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -60,13 +59,6 @@ public class PostService {
         Post post = postRepo.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found with id: " + postId));
 
-        // Check if current user is the author
-        String currentUsername = getCurrentUsername();
-        UserDTO currentUser = userService.getUserByUsername(currentUsername);
-        if (!post.getAuthorId().equals(currentUser.getId())) {
-            throw new AccessDeniedException("You can only update your own posts");
-        }
-
         if (request.getTitle() != null) {
             post.setTitle(request.getTitle());
         }
@@ -83,14 +75,8 @@ public class PostService {
     }
 
     public void deletePost(UUID postId) {
-        Post post = postRepo.findById(postId)
-                .orElseThrow(() -> new ResourceNotFoundException("Post not found with id: " + postId));
-
-        // Check if current user is the author
-        String currentUsername = getCurrentUsername();
-        UserDTO currentUser = userService.getUserByUsername(currentUsername);
-        if (!post.getAuthorId().equals(currentUser.getId())) {
-            throw new AccessDeniedException("You can only delete your own posts");
+        if (!postRepo.existsById(postId)) {
+            throw new ResourceNotFoundException("Post not found with id: " + postId);
         }
 
         postRepo.deleteById(postId);
@@ -110,13 +96,6 @@ public class PostService {
         Post post = postRepo.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found with id: " + postId));
 
-        // Check if current user is the author
-        String currentUsername = getCurrentUsername();
-        UserDTO currentUser = userService.getUserByUsername(currentUsername);
-        if (!post.getAuthorId().equals(currentUser.getId())) {
-            throw new AccessDeniedException("You can only publish your own posts");
-        }
-
         post.setPublished(true);
         post.setUpdatedAt(Instant.now());
         Post updatedPost = postRepo.save(post);
@@ -126,13 +105,6 @@ public class PostService {
     public PostDTO unpublishPost(UUID postId) {
         Post post = postRepo.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found with id: " + postId));
-
-        // Check if current user is the author
-        String currentUsername = getCurrentUsername();
-        UserDTO currentUser = userService.getUserByUsername(currentUsername);
-        if (!post.getAuthorId().equals(currentUser.getId())) {
-            throw new AccessDeniedException("You can only unpublish your own posts");
-        }
 
         post.setPublished(false);
         post.setUpdatedAt(Instant.now());

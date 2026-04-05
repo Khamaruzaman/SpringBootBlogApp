@@ -8,7 +8,6 @@ import com.example.BlogApp.model.Comment;
 import com.example.BlogApp.repo.CommentRepo;
 import com.example.BlogApp.repo.PostRepo;
 import lombok.AllArgsConstructor;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -26,8 +25,9 @@ public class CommentService {
 
     public CommentDTO addComment(CreateCommentRequest request) {
         // Verify post exists
-        postRepo.findById(request.getPostId())
-                .orElseThrow(() -> new ResourceNotFoundException("Post not found with id: " + request.getPostId()));
+        if (!postRepo.existsById(request.getPostId())) {
+            throw new ResourceNotFoundException("Post not found with id: " + request.getPostId());
+        }
 
         String currentUsername = getCurrentUsername();
         UserDTO currentUser = userService.getUserByUsername(currentUsername);
@@ -56,29 +56,15 @@ public class CommentService {
         Comment comment = commentRepo.findById(commentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Comment not found with id: " + commentId));
 
-        // Check if current user is the author
-        String currentUsername = getCurrentUsername();
-        UserDTO currentUser = userService.getUserByUsername(currentUsername);
-        if (!comment.getAuthorId().equals(currentUser.getId())) {
-            throw new AccessDeniedException("You can only update your own comments");
-        }
-
         comment.setContent(request.getContent());
         Comment updatedComment = commentRepo.save(comment);
         return mapCommentToDTO(updatedComment);
     }
 
     public void deleteComment(UUID commentId) {
-        Comment comment = commentRepo.findById(commentId)
-                .orElseThrow(() -> new ResourceNotFoundException("Comment not found with id: " + commentId));
-
-        // Check if current user is the author
-        String currentUsername = getCurrentUsername();
-        UserDTO currentUser = userService.getUserByUsername(currentUsername);
-        if (!comment.getAuthorId().equals(currentUser.getId())) {
-            throw new AccessDeniedException("You can only delete your own comments");
+        if (!commentRepo.existsById(commentId)) {
+            throw new ResourceNotFoundException("Comment not found with id: " + commentId);
         }
-
         commentRepo.deleteById(commentId);
     }
 
