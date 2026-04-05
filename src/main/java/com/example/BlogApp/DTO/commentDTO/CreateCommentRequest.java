@@ -11,6 +11,5 @@ import java.util.UUID;
 @Builder
 public class CreateCommentRequest {
     private String content;
-    private UUID authorId;
     private UUID postId;
 }
