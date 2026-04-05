@@ -1,5 +1,6 @@
 package com.example.BlogApp.model;
 
+import com.example.BlogApp.utils.UUIDGenerator.Identifiable;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -15,7 +16,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Comment {
+public class Comment implements Identifiable {
     @Id
     private UUID id;
     private String content;
@@ -32,4 +33,3 @@ public class Comment {
     @LastModifiedDate
     private Instant updatedAt;
 }
-
