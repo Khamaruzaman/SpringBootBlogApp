@@ -27,8 +27,10 @@ public class PostService {
 
     public Page<PostDTO> getAllPosts(Pageable pageable) {
         try {
-            return postRepo.findByPublishedTrue(pageable)
+            Page<PostDTO> posts = postRepo.findByPublishedTrue(pageable)
                     .map(this::mapPostToDTO);
+            log.info("Retrieved {} posts (page {}, size {})", posts.getTotalElements(), pageable.getPageNumber(), pageable.getPageSize());
+            return posts;
         } catch (Exception e) {
             log.error("Error retrieving all posts: {}", e.getMessage());
             throw e;
@@ -44,6 +46,7 @@ public class PostService {
             post.setViews(post.getViews() + 1);
             postRepo.save(post);
 
+            log.info("Post with id {} retrieved, views incremented to {}", postId, post.getViews());
             return mapPostToDTO(post);
         } catch (Exception e) {
             log.error("Error retrieving post by id {}: {}", postId, e.getMessage());
@@ -65,6 +68,7 @@ public class PostService {
             post.setViews(0);
 
             Post savedPost = postRepo.save(post);
+            log.info("Post '{}' created successfully by user {}", savedPost.getTitle(), currentUsername);
             return mapPostToDTO(savedPost);
         } catch (Exception e) {
             log.error("Error creating post: {}", e.getMessage());
@@ -89,6 +93,7 @@ public class PostService {
             post.setUpdatedAt(Instant.now());
 
             Post updatedPost = postRepo.save(post);
+            log.info("Post with id {} updated successfully", postId);
             return mapPostToDTO(updatedPost);
         } catch (Exception e) {
             log.error("Error updating post with id {}: {}", postId, e.getMessage());
@@ -103,6 +108,7 @@ public class PostService {
             }
 
             postRepo.deleteById(postId);
+            log.info("Post with id {} deleted successfully", postId);
         } catch (Exception e) {
             log.error("Error deleting post with id {}: {}", postId, e.getMessage());
             throw e;
@@ -111,8 +117,10 @@ public class PostService {
 
     public Page<PostDTO> getPostsByAuthor(UUID authorId, Pageable pageable) {
         try {
-            return postRepo.findByAuthorId(authorId, pageable)
+            Page<PostDTO> posts = postRepo.findByAuthorId(authorId, pageable)
                     .map(this::mapPostToDTO);
+            log.info("Retrieved {} posts by author {} (page {}, size {})", posts.getTotalElements(), authorId, pageable.getPageNumber(), pageable.getPageSize());
+            return posts;
         } catch (Exception e) {
             log.error("Error retrieving posts by author {}: {}", authorId, e.getMessage());
             throw e;
@@ -121,8 +129,10 @@ public class PostService {
 
     public Page<PostDTO> searchPosts(String keyword, Pageable pageable) {
         try {
-            return postRepo.findByTitleContaining(keyword, pageable)
+            Page<PostDTO> posts = postRepo.findByTitleContaining(keyword, pageable)
                     .map(this::mapPostToDTO);
+            log.info("Searched posts with keyword '{}' - found {} results (page {}, size {})", keyword, posts.getTotalElements(), pageable.getPageNumber(), pageable.getPageSize());
+            return posts;
         } catch (Exception e) {
             log.error("Error searching posts with keyword {}: {}", keyword, e.getMessage());
             throw e;
@@ -137,6 +147,7 @@ public class PostService {
             post.setPublished(true);
             post.setUpdatedAt(Instant.now());
             Post updatedPost = postRepo.save(post);
+            log.info("Post with id {} published successfully", postId);
             return mapPostToDTO(updatedPost);
         } catch (Exception e) {
             log.error("Error publishing post with id {}: {}", postId, e.getMessage());
@@ -152,6 +163,7 @@ public class PostService {
             post.setPublished(false);
             post.setUpdatedAt(Instant.now());
             Post updatedPost = postRepo.save(post);
+            log.info("Post with id {} unpublished successfully", postId);
             return mapPostToDTO(updatedPost);
         } catch (Exception e) {
             log.error("Error unpublishing post with id {}: {}", postId, e.getMessage());

@@ -32,7 +32,9 @@ public class AuthenticationService {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public boolean userExists(@NonNull RegisterRequest registerRequest) {
-        return userRepo.existsByUsername(registerRequest.getUsername()) || userRepo.existsByEmail(registerRequest.getEmail());
+        boolean exists = userRepo.existsByUsername(registerRequest.getUsername()) || userRepo.existsByEmail(registerRequest.getEmail());
+        log.info("User existence check for username: {}, email: {} - exists: {}", registerRequest.getUsername(), registerRequest.getEmail(), exists);
+        return exists;
     }
 
     public User saveUser(@NonNull RegisterRequest registerRequest) {
@@ -42,7 +44,9 @@ public class AuthenticationService {
             user.setEmail(registerRequest.getEmail());
             user.setPassword(bCryptPasswordEncoder.encode(registerRequest.getPassword()));
             user.setRoles(Set.of("USER"));
-            return userRepo.save(user);
+            User savedUser = userRepo.save(user);
+            log.info("User {} registered successfully", savedUser.getUsername());
+            return savedUser;
         } catch (Exception e) {
             log.error("Error saving user: {}", e.getMessage());
             throw e;
@@ -57,6 +61,7 @@ public class AuthenticationService {
             if (!authentication.isAuthenticated()) {
                 throw new AuthenticationException("Invalid username or password");
             }
+            log.info("User {} logged in successfully", loginRequest.getUsername());
             return generateTokenForUser(loginRequest.getUsername());
         } catch (BadCredentialsException e) {
             log.error("Authentication failed for user: {}", loginRequest.getUsername());
@@ -78,6 +83,8 @@ public class AuthenticationService {
      */
     public String generateTokenForUser(@NonNull String username) {
         UserDetails userDetails = myUserDetailsService.loadUserByUsername(username);
-        return jwtTokenProvider.generateToken(userDetails);
+        String token = jwtTokenProvider.generateToken(userDetails);
+        log.info("JWT token generated for user: {}", username);
+        return token;
     }
 }

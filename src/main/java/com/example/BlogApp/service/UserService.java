@@ -26,6 +26,7 @@ public class UserService {
         try {
             User user = userRepo.findById(userId)
                     .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+            log.info("User with id {} retrieved successfully", userId);
             return mapToUserDTO(user);
         } catch (Exception e) {
             log.error("Error retrieving user by id {}: {}", userId, e.getMessage());
@@ -39,6 +40,7 @@ public class UserService {
             if (user == null) {
                 throw new ResourceNotFoundException("User not found with username: " + username);
             }
+            log.info("User with username {} retrieved successfully", username);
             return mapToUserDTO(user);
         } catch (Exception e) {
             log.error("Error retrieving user by username {}: {}", username, e.getMessage());
@@ -74,6 +76,7 @@ public class UserService {
 
             user.setUpdatedAt(Instant.now());
             userRepo.save(user);
+            log.info("User profile for id {} updated successfully", userId);
             return mapToUserDTO(user);
         } catch (Exception e) {
             log.error("Error updating user profile for id {}: {}", userId, e.getMessage());
@@ -83,9 +86,11 @@ public class UserService {
 
     public List<UserDTO> getAllUsers() {
         try {
-            return userRepo.findAll().stream()
+            List<UserDTO> users = userRepo.findAll().stream()
                     .map(this::mapToUserDTO)
                     .toList();
+            log.info("Retrieved {} users", users.size());
+            return users;
         } catch (Exception e) {
             log.error("Error retrieving all users: {}", e.getMessage());
             throw e;
@@ -98,6 +103,7 @@ public class UserService {
                 throw new ResourceNotFoundException("User not found with id: " + userId);
             }
             userRepo.deleteById(userId);
+            log.info("User with id {} deleted successfully", userId);
         } catch (Exception e) {
             log.error("Error deleting user with id {}: {}", userId, e.getMessage());
             throw e;

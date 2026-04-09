@@ -41,6 +41,7 @@ public class CommentService {
             comment.setPostId(request.getPostId());
 
             Comment savedComment = commentRepo.save(comment);
+            log.info("Comment added successfully for post {} by user {}", request.getPostId(), currentUsername);
             return mapCommentToDTO(savedComment);
         } catch (Exception e) {
             log.error("Error adding comment to post {}: {}", request.getPostId(), e.getMessage());
@@ -55,9 +56,11 @@ public class CommentService {
                 throw new ResourceNotFoundException("Post not found with id: " + postId);
             }
 
-            return commentRepo.findByPostId(postId).stream()
+            List<CommentDTO> comments = commentRepo.findByPostId(postId).stream()
                     .map(this::mapCommentToDTO)
                     .collect(Collectors.toList());
+            log.info("Retrieved {} comments for post {}", comments.size(), postId);
+            return comments;
         } catch (Exception e) {
             log.error("Error retrieving comments for post {}: {}", postId, e.getMessage());
             throw e;
@@ -71,6 +74,7 @@ public class CommentService {
 
             comment.setContent(request.getContent());
             Comment updatedComment = commentRepo.save(comment);
+            log.info("Comment with id {} updated successfully", commentId);
             return mapCommentToDTO(updatedComment);
         } catch (Exception e) {
             log.error("Error updating comment with id {}: {}", commentId, e.getMessage());
@@ -84,6 +88,7 @@ public class CommentService {
                 throw new ResourceNotFoundException("Comment not found with id: " + commentId);
             }
             commentRepo.deleteById(commentId);
+            log.info("Comment with id {} deleted successfully", commentId);
         } catch (Exception e) {
             log.error("Error deleting comment with id {}: {}", commentId, e.getMessage());
             throw e;
