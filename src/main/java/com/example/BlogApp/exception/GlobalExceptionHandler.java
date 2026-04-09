@@ -53,6 +53,16 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.NOT_FOUND, "Resource Not Found", ex.getMessage(), null);
     }
 
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<AuthResponse<Map<String, Object>>> handleAuthenticationException(AuthenticationException ex) {
+        return buildErrorResponse(HttpStatus.UNAUTHORIZED, "Authentication Failed", ex.getMessage(), null);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<AuthResponse<Map<String, Object>>> handleIllegalArgumentException(IllegalArgumentException ex) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Bad Request", ex.getMessage(), null);
+    }
+
     private ResponseEntity<AuthResponse<Map<String, Object>>> buildErrorResponse(HttpStatus status, String errorType, String message, String details) {
         Map<String, Object> errorDetails = new HashMap<>();
         errorDetails.put("timestamp", Instant.now());

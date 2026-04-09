@@ -8,6 +8,7 @@ import com.example.BlogApp.model.User;
 import com.example.BlogApp.service.AuthenticationService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
  * All responses are wrapped in {@link AuthResponse} for consistent API format.
  * </p>
  */
+@Log4j2
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/auth")
@@ -38,38 +40,20 @@ public class AuthenticationController {
     @PostMapping("/register")
     public ResponseEntity<AuthResponse<JwtAuthenticationResponse>> register(
             @Valid @RequestBody RegisterRequest registerRequest) {
-        try {
-            if (!authenticationService.userExists(registerRequest)) {
-                User savedUser = authenticationService.saveUser(registerRequest);
+        User savedUser = authenticationService.saveUser(registerRequest);
 
-                // Generate JWT token for the newly registered user
-                JwtAuthenticationResponse jwtResponse = new JwtAuthenticationResponse();
-                jwtResponse.setAccessToken(authenticationService.generateTokenForUser(savedUser.getUsername()));
-                jwtResponse.setUsername(savedUser.getUsername());
-                jwtResponse.setTokenType("Bearer");
+        // Generate JWT token for the newly registered user
+        JwtAuthenticationResponse jwtResponse = new JwtAuthenticationResponse();
+        jwtResponse.setAccessToken(authenticationService.generateTokenForUser(savedUser.getUsername()));
+        jwtResponse.setUsername(savedUser.getUsername());
+        jwtResponse.setTokenType("Bearer");
 
-                AuthResponse<JwtAuthenticationResponse> response = new AuthResponse<>();
-                response.setSuccess(true);
-                response.setMessage("User registered successfully");
-                response.setData(jwtResponse);
+        AuthResponse<JwtAuthenticationResponse> response = new AuthResponse<>();
+        response.setSuccess(true);
+        response.setMessage("User registered successfully");
+        response.setData(jwtResponse);
 
-                return ResponseEntity.status(HttpStatus.CREATED).body(response);
-            } else {
-                AuthResponse<JwtAuthenticationResponse> errorResponse = new AuthResponse<>();
-                errorResponse.setSuccess(false);
-                errorResponse.setMessage("User with same username or email already exists");
-                errorResponse.setData(null);
-
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-            }
-        } catch (Exception e) {
-            AuthResponse<JwtAuthenticationResponse> errorResponse = new AuthResponse<>();
-            errorResponse.setSuccess(false);
-            errorResponse.setMessage("Registration failed: " + e.getMessage());
-            errorResponse.setData(null);
-
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     /**
@@ -81,36 +65,18 @@ public class AuthenticationController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse<JwtAuthenticationResponse>> login(
             @Valid @RequestBody LoginRequest loginRequest) {
-        try {
-            String token = authenticationService.verifyUser(loginRequest);
+        String token = authenticationService.verifyUser(loginRequest);
 
-            if ("Authentication Failed".equals(token)) {
-                AuthResponse<JwtAuthenticationResponse> errorResponse = new AuthResponse<>();
-                errorResponse.setSuccess(false);
-                errorResponse.setMessage("Invalid username or password");
-                errorResponse.setData(null);
+        JwtAuthenticationResponse jwtResponse = new JwtAuthenticationResponse();
+        jwtResponse.setAccessToken(token);
+        jwtResponse.setUsername(loginRequest.getUsername());
+        jwtResponse.setTokenType("Bearer");
 
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
-            }
+        AuthResponse<JwtAuthenticationResponse> response = new AuthResponse<>();
+        response.setSuccess(true);
+        response.setMessage("Login successful");
+        response.setData(jwtResponse);
 
-            JwtAuthenticationResponse jwtResponse = new JwtAuthenticationResponse();
-            jwtResponse.setAccessToken(token);
-            jwtResponse.setUsername(loginRequest.getUsername());
-            jwtResponse.setTokenType("Bearer");
-
-            AuthResponse<JwtAuthenticationResponse> response = new AuthResponse<>();
-            response.setSuccess(true);
-            response.setMessage("Login successful");
-            response.setData(jwtResponse);
-
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            AuthResponse<JwtAuthenticationResponse> errorResponse = new AuthResponse<>();
-            errorResponse.setSuccess(false);
-            errorResponse.setMessage("Login failed: " + e.getMessage());
-            errorResponse.setData(null);
-
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
-        }
+        return ResponseEntity.ok(response);
     }
 }

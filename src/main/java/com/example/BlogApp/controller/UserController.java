@@ -23,91 +23,51 @@ public class UserController {
     @GetMapping
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<AuthResponse<List<UserDTO>>> getAllUsers() {
-        try {
-            AuthResponse<List<UserDTO>> response = new AuthResponse<>();
-            response.setSuccess(true);
-            response.setMessage("Users retrieved successfully");
-            response.setData(userService.getAllUsers());
-            return ResponseEntity.status(HttpStatus.OK).body(response);
-        } catch (Exception e) {
-            AuthResponse<List<UserDTO>> response = new AuthResponse<>();
-            response.setSuccess(false);
-            response.setMessage("Users retrieved failed: " + e.getMessage());
-            response.setData(null);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
+        AuthResponse<List<UserDTO>> response = new AuthResponse<>();
+        response.setSuccess(true);
+        response.setMessage("Users retrieved successfully");
+        response.setData(userService.getAllUsers());
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/{userId}")
     @PreAuthorize("hasAuthority('ADMIN') or #userId == authentication.principal.user.id")
     public ResponseEntity<AuthResponse<UserDTO>> getUserById(@PathVariable UUID userId) {
-        try {
-            AuthResponse<UserDTO> response = new AuthResponse<>();
-            response.setSuccess(true);
-            response.setMessage("User retrieved successfully");
-            response.setData(userService.getUserById(userId));
-            return ResponseEntity.status(HttpStatus.OK).body(response);
-        } catch (Exception e) {
-            AuthResponse<UserDTO> response = new AuthResponse<>();
-            response.setSuccess(false);
-            response.setMessage("User retrieval failed: " + e.getMessage());
-            response.setData(null);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-        }
+        AuthResponse<UserDTO> response = new AuthResponse<>();
+        response.setSuccess(true);
+        response.setMessage("User retrieved successfully");
+        response.setData(userService.getUserById(userId));
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/username/{username}")
     @PreAuthorize("hasAuthority('ADMIN') or #username == authentication.principal.user.username")
     public ResponseEntity<AuthResponse<UserDTO>> getUserByUsername(@PathVariable String username) {
-        try {
-            AuthResponse<UserDTO> response = new AuthResponse<>();
-            response.setSuccess(true);
-            response.setMessage("User retrieved successfully");
-            response.setData(userService.getUserByUsername(username));
-            return ResponseEntity.status(HttpStatus.OK).body(response);
-        } catch (Exception e) {
-            AuthResponse<UserDTO> response = new AuthResponse<>();
-            response.setSuccess(false);
-            response.setMessage("User retrieval failed: " + e.getMessage());
-            response.setData(null);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-        }
+        AuthResponse<UserDTO> response = new AuthResponse<>();
+        response.setSuccess(true);
+        response.setMessage("User retrieved successfully");
+        response.setData(userService.getUserByUsername(username));
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PutMapping("/{userId}")
     @PreAuthorize("hasAuthority('ADMIN') or #userId == authentication.principal.user.id")
     public ResponseEntity<AuthResponse<UserDTO>> updateUserProfile(@PathVariable UUID userId, @Valid @RequestBody UpdateUserRequest request) {
-        try {
-            AuthResponse<UserDTO> response = new AuthResponse<>();
-            response.setSuccess(true);
-            response.setMessage("User profile updated successfully");
-            response.setData(userService.updateUserProfile(userId, request));
-            return ResponseEntity.status(HttpStatus.OK).body(response);
-        } catch (Exception e) {
-            AuthResponse<UserDTO> response = new AuthResponse<>();
-            response.setSuccess(false);
-            response.setMessage("User profile update failed: " + e.getMessage());
-            response.setData(null);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }
+        AuthResponse<UserDTO> response = new AuthResponse<>();
+        response.setSuccess(true);
+        response.setMessage("User profile updated successfully");
+        response.setData(userService.updateUserProfile(userId, request));
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @DeleteMapping("/{userId}")
     @PreAuthorize("hasAuthority('ADMIN') or #userId == authentication.principal.user.id")
     public ResponseEntity<AuthResponse<Void>> deleteUser(@PathVariable UUID userId) {
-        try {
-            userService.deleteUser(userId);
-            AuthResponse<Void> response = new AuthResponse<>();
-            response.setSuccess(true);
-            response.setMessage("User deleted successfully");
-            response.setData(null);
-            return ResponseEntity.status(HttpStatus.OK).body(response);
-        } catch (Exception e) {
-            AuthResponse<Void> response = new AuthResponse<>();
-            response.setSuccess(false);
-            response.setMessage("User deletion failed: " + e.getMessage());
-            response.setData(null);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-        }
+        userService.deleteUser(userId);
+        AuthResponse<Void> response = new AuthResponse<>();
+        response.setSuccess(true);
+        response.setMessage("User deleted successfully");
+        response.setData(null);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

@@ -2,13 +2,16 @@ package com.example.BlogApp.service;
 
 import com.example.BlogApp.DTO.authDTO.LoginRequest;
 import com.example.BlogApp.DTO.authDTO.RegisterRequest;
+import com.example.BlogApp.exception.AuthenticationException;
 import com.example.BlogApp.model.User;
 import com.example.BlogApp.repo.UserRepo;
 import com.example.BlogApp.security.JwtTokenProvider;
 import com.example.BlogApp.security.MyUserDetailsService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,6 +22,7 @@ import java.util.Set;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class AuthenticationService {
 
     private UserRepo userRepo;
@@ -32,20 +36,37 @@ public class AuthenticationService {
     }
 
     public User saveUser(@NonNull RegisterRequest registerRequest) {
-        User user = new User();
-        user.setUsername(registerRequest.getUsername());
-        user.setEmail(registerRequest.getEmail());
-        user.setPassword(bCryptPasswordEncoder.encode(registerRequest.getPassword()));
-        user.setRoles(Set.of("USER"));
-        userRepo.save(user);
-        return user;
+        try {
+            User user = new User();
+            user.setUsername(registerRequest.getUsername());
+            user.setEmail(registerRequest.getEmail());
+            user.setPassword(bCryptPasswordEncoder.encode(registerRequest.getPassword()));
+            user.setRoles(Set.of("USER"));
+            return userRepo.save(user);
+        } catch (Exception e) {
+            log.error("Error saving user: {}", e.getMessage());
+            throw e;
+        }
     }
 
     public String verifyUser(@NonNull LoginRequest loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
-        );
-        return authentication.isAuthenticated() ? generateTokenForUser(loginRequest.getUsername()) : "Authentication Failed";
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
+            );
+            if (!authentication.isAuthenticated()) {
+                throw new AuthenticationException("Invalid username or password");
+            }
+            return generateTokenForUser(loginRequest.getUsername());
+        } catch (BadCredentialsException e) {
+            log.error("Authentication failed for user: {}", loginRequest.getUsername());
+            throw new AuthenticationException("Invalid username or password");
+        } catch (AuthenticationException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Unexpected error during authentication: {}", e.getMessage());
+            throw new AuthenticationException("Authentication failed due to an unexpected error");
+        }
     }
 
     /**

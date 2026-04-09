@@ -21,30 +21,20 @@ public class CommentController {
 
     @PostMapping("/posts/{postId}/comments")
     public ResponseEntity<AuthResponse<CommentDTO>> addComment(@PathVariable UUID postId, @RequestBody CreateCommentRequest request) {
-        try {
-            // Set postId in request
-            request.setPostId(postId);
+        // Set postId in request
+        request.setPostId(postId);
 
-            CommentDTO comment = commentService.addComment(request);
+        CommentDTO comment = commentService.addComment(request);
 
-            AuthResponse<CommentDTO> response = new AuthResponse<>();
-            response.setData(comment);
-            response.setSuccess(true);
-            response.setMessage("Comment added successfully");
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        } catch (Exception e) {
-            AuthResponse<CommentDTO> response = new AuthResponse<>();
-            response.setSuccess(false);
-            response.setMessage("Comment creation failed: " + e.getMessage());
-            response.setData(null);
-            HttpStatus status = e.getMessage().contains("not found") ? HttpStatus.NOT_FOUND : HttpStatus.INTERNAL_SERVER_ERROR;
-            return ResponseEntity.status(status).body(response);
-        }
+        AuthResponse<CommentDTO> response = new AuthResponse<>();
+        response.setData(comment);
+        response.setSuccess(true);
+        response.setMessage("Comment added successfully");
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/posts/{postId}/comments")
     public ResponseEntity<AuthResponse<List<CommentDTO>>> getCommentsByPost(@PathVariable UUID postId) {
-        try {
             List<CommentDTO> comments = commentService.getCommentsByPost(postId);
 
             AuthResponse<List<CommentDTO>> response = new AuthResponse<>();
@@ -52,57 +42,29 @@ public class CommentController {
             response.setSuccess(true);
             response.setMessage("Comments retrieved successfully");
             return ResponseEntity.status(HttpStatus.OK).body(response);
-        } catch (Exception e) {
-            AuthResponse<List<CommentDTO>> response = new AuthResponse<>();
-            response.setSuccess(false);
-            response.setMessage("Comments retrieval failed: " + e.getMessage());
-            response.setData(null);
-            HttpStatus status = e.getMessage().contains("not found") ? HttpStatus.NOT_FOUND : HttpStatus.INTERNAL_SERVER_ERROR;
-            return ResponseEntity.status(status).body(response);
-        }
     }
 
     @PutMapping("/comments/{commentId}")
     @PreAuthorize("@securityService.isCommentAuthor(#commentId)")
     public ResponseEntity<AuthResponse<CommentDTO>> updateComment(@PathVariable UUID commentId, @RequestBody CreateCommentRequest request) {
-        try {
-            CommentDTO updatedComment = commentService.updateComment(commentId, request);
+        CommentDTO updatedComment = commentService.updateComment(commentId, request);
 
-            AuthResponse<CommentDTO> response = new AuthResponse<>();
-            response.setData(updatedComment);
-            response.setSuccess(true);
-            response.setMessage("Comment updated successfully");
-            return ResponseEntity.status(HttpStatus.OK).body(response);
-        } catch (Exception e) {
-            AuthResponse<CommentDTO> response = new AuthResponse<>();
-            response.setSuccess(false);
-            response.setMessage("Comment update failed: " + e.getMessage());
-            response.setData(null);
-            HttpStatus status = e.getMessage().contains("not found") ? HttpStatus.NOT_FOUND :
-                               HttpStatus.INTERNAL_SERVER_ERROR;
-            return ResponseEntity.status(status).body(response);
-        }
+        AuthResponse<CommentDTO> response = new AuthResponse<>();
+        response.setData(updatedComment);
+        response.setSuccess(true);
+        response.setMessage("Comment updated successfully");
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @DeleteMapping("/comments/{commentId}")
     @PreAuthorize("@securityService.canDeleteComment(#commentId)")
     public ResponseEntity<AuthResponse<Void>> deleteComment(@PathVariable UUID commentId) {
-        try {
-            commentService.deleteComment(commentId);
+        commentService.deleteComment(commentId);
 
-            AuthResponse<Void> response = new AuthResponse<>();
-            response.setSuccess(true);
-            response.setMessage("Comment deleted successfully");
-            response.setData(null);
-            return ResponseEntity.status(HttpStatus.OK).body(response);
-        } catch (Exception e) {
-            AuthResponse<Void> response = new AuthResponse<>();
-            response.setSuccess(false);
-            response.setMessage("Comment deletion failed: " + e.getMessage());
-            response.setData(null);
-            HttpStatus status = e.getMessage().contains("not found") ? HttpStatus.NOT_FOUND :
-                               HttpStatus.INTERNAL_SERVER_ERROR;
-            return ResponseEntity.status(status).body(response);
-        }
+        AuthResponse<Void> response = new AuthResponse<>();
+        response.setSuccess(true);
+        response.setMessage("Comment deleted successfully");
+        response.setData(null);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }
