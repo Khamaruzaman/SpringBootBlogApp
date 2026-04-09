@@ -3,6 +3,7 @@ package com.example.BlogApp.DTO.userDTO;
 import com.example.BlogApp.utils.FieldsValueMatch;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
@@ -14,6 +15,8 @@ import lombok.*;
 @FieldsValueMatch(field = "password", fieldMatch = "confirmPassword", message = "Passwords do not match!")
 public class UpdateUserRequest {
     @NotBlank(message = "Username cannot be empty")
+    @Pattern(regexp = "^[a-zA-Z0-9_]{5,15}$",
+             message = "Username must be 5-15 characters and can only contain letters, numbers, and underscores")
     private String username;
 
     @Email(message = "Invalid email format")
