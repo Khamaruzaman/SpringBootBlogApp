@@ -5,6 +5,7 @@ import com.example.BlogApp.DTO.postDTO.CreatePostRequest;
 import com.example.BlogApp.DTO.postDTO.PostDTO;
 import com.example.BlogApp.DTO.postDTO.UpdatePostRequest;
 import com.example.BlogApp.service.PostService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -48,7 +49,7 @@ public class PostController {
     }
 
     @PostMapping
-    public ResponseEntity<AuthResponse<PostDTO>> createPost(@RequestBody CreatePostRequest request) {
+    public ResponseEntity<AuthResponse<PostDTO>> createPost(@Valid @RequestBody CreatePostRequest request) {
         AuthResponse<PostDTO> response = new AuthResponse<>();
         response.setSuccess(true);
         response.setData(postService.createPost(request));
@@ -58,7 +59,7 @@ public class PostController {
 
     @PutMapping("/{postId}")
     @PreAuthorize("@securityService.isPostAuthor(#postId)")
-    public ResponseEntity<AuthResponse<PostDTO>> updatePost(@PathVariable UUID postId, @RequestBody UpdatePostRequest request) {
+    public ResponseEntity<AuthResponse<PostDTO>> updatePost(@PathVariable UUID postId, @Valid @RequestBody UpdatePostRequest request) {
         PostDTO updatedPost = postService.updatePost(postId, request);
 
         AuthResponse<PostDTO> response = new AuthResponse<>();
