@@ -1,14 +1,15 @@
 package com.example.BlogApp.security;
 
-import jakarta.servlet.ServletException;
+import com.example.BlogApp.exception.GlobalExceptionHandler;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
-
-import java.io.IOException;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 /**
  * JWT Authentication Entry Point for handling unauthorized access (401) responses.
@@ -21,35 +22,31 @@ import java.io.IOException;
 @Component
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
+    private final HandlerExceptionResolver resolver;
+
+    // Inject the primary HandlerExceptionResolver
+    public JwtAuthenticationEntryPoint(
+            @Qualifier("handlerExceptionResolver") HandlerExceptionResolver resolver) {
+        this.resolver = resolver;
+    }
+
     /**
      * Handles the case when a client requests a protected resource without authentication.
-     * Returns a JSON response with error details and HTTP status 401 (Unauthorized).
+     * Returns a JSON response with error details and HTTP status 401 (Unauthorized) from {@link GlobalExceptionHandler}.
      *
      * @param request that resulted in an AuthenticationException
      * @param response so that the user agent can begin authentication
      * @param authException that caused the invocation
-     * @throws IOException if an input or output error occurs
-     * @throws ServletException if a servlet error occurs
      */
     @Override
     public void commence(
-            HttpServletRequest request,
-            HttpServletResponse response,
+            @NonNull HttpServletRequest request,
+            @NonNull HttpServletResponse response,
             AuthenticationException authException
-    ) throws IOException, ServletException {
+    ) {
         log.error("Unauthorized access attempt. Error: {}", authException.getMessage());
 
-        response.setContentType("application/json");
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-
-        String errorResponse = String.format(
-                "{\"success\":false,\"status\":%d,\"message\":\"Unauthorized: %s\",\"error\":\"Authentication Required\",\"path\":\"%s\"}",
-                HttpServletResponse.SC_UNAUTHORIZED,
-                authException.getMessage(),
-                request.getServletPath()
-        );
-
-        response.getWriter().write(errorResponse);
+        resolver.resolveException(request, response, null, authException);
     }
 }
 

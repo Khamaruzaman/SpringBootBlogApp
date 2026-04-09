@@ -53,8 +53,11 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.NOT_FOUND, "Resource Not Found", ex.getMessage(), null);
     }
 
-    @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<AuthResponse<Map<String, Object>>> handleAuthenticationException(AuthenticationException ex) {
+    @ExceptionHandler({
+            AuthenticationException.class,
+            org.springframework.security.core.AuthenticationException.class
+    })
+    public ResponseEntity<AuthResponse<Map<String, Object>>> handleAuthenticationException(Exception ex) {
         return buildErrorResponse(HttpStatus.UNAUTHORIZED, "Authentication Failed", ex.getMessage(), null);
     }
 
