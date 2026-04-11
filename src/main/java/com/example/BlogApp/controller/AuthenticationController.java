@@ -6,6 +6,9 @@ import com.example.BlogApp.DTO.authDTO.LoginRequest;
 import com.example.BlogApp.DTO.authDTO.RegisterRequest;
 import com.example.BlogApp.model.User;
 import com.example.BlogApp.service.AuthenticationService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -27,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/auth")
+@Tag(name = "Authentication", description = "Operations related to authentication")
 public class AuthenticationController {
 
     private AuthenticationService authenticationService;
@@ -38,6 +42,9 @@ public class AuthenticationController {
      * @return AuthResponse containing user data and JWT token
      */
     @PostMapping("/register")
+    @Operation(summary = "Register a new user", description = "Registers a new user and returns a JWT token upon successful registration")
+    @ApiResponse(responseCode = "201", description = "User registered successfully")
+    @ApiResponse(responseCode = "400", description = "Invalid registration details")
     public ResponseEntity<AuthResponse<JwtAuthenticationResponse>> register(
             @Valid @RequestBody RegisterRequest registerRequest) {
         User savedUser = authenticationService.saveUser(registerRequest);
@@ -63,6 +70,9 @@ public class AuthenticationController {
      * @return AuthResponse containing JWT token and user information
      */
     @PostMapping("/login")
+    @Operation(summary = "Login user", description = "Authenticates user and returns a JWT token upon successful login")
+    @ApiResponse(responseCode = "200", description = "Login successful")
+    @ApiResponse(responseCode = "401", description = "Invalid username or password")
     public ResponseEntity<AuthResponse<JwtAuthenticationResponse>> login(
             @Valid @RequestBody LoginRequest loginRequest) {
         String token = authenticationService.verifyUser(loginRequest);

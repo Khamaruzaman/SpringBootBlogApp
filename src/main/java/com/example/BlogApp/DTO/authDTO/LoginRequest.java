@@ -1,5 +1,6 @@
 package com.example.BlogApp.DTO.authDTO;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -8,6 +9,7 @@ import lombok.Setter;
 
 @Setter
 @Getter
+@Schema(description = "Login request payload containing username and password")
 public class LoginRequest {
     @NotBlank(message = "Username cannot be empty")
     @Pattern(regexp = "^[a-zA-Z0-9_]{5,15}$",

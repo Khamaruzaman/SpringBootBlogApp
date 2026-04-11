@@ -1,5 +1,6 @@
 package com.example.BlogApp.DTO.userDTO;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.time.Instant;
@@ -17,6 +18,7 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Schema(description = "Data Transfer Object for User, used for API responses.")
 public class UserDTO {
     private UUID id;
     private String username;

@@ -129,7 +129,7 @@ public class PostService {
 
     public Page<PostDTO> searchPosts(String keyword, Pageable pageable) {
         try {
-            Page<PostDTO> posts = postRepo.findByTitleContaining(keyword, pageable)
+            Page<PostDTO> posts = postRepo.findByTitleContainingOrContentContaining(keyword, keyword, pageable)
                     .map(this::mapPostToDTO);
             log.info("Searched posts with keyword '{}' - found {} results (page {}, size {})", keyword, posts.getTotalElements(), pageable.getPageNumber(), pageable.getPageSize());
             return posts;

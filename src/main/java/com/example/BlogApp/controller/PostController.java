@@ -5,6 +5,8 @@ import com.example.BlogApp.DTO.postDTO.CreatePostRequest;
 import com.example.BlogApp.DTO.postDTO.PostDTO;
 import com.example.BlogApp.DTO.postDTO.UpdatePostRequest;
 import com.example.BlogApp.service.PostService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,10 +22,12 @@ import java.util.UUID;
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/posts")
+@Tag(name = "Posts", description = "Endpoints for managing blog posts")
 public class PostController {
     private PostService postService;
 
     @GetMapping
+    @Operation(summary = "Get all posts with pagination", description = "Retrieve a paginated list of all blog posts")
     public ResponseEntity<AuthResponse<Page<PostDTO>>> getAllPosts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
@@ -38,6 +42,7 @@ public class PostController {
     }
 
     @GetMapping("/{postId}")
+    @Operation(summary = "Get post by ID", description = "Retrieve a single blog post by its unique identifier")
     public ResponseEntity<AuthResponse<PostDTO>> getPostById(@PathVariable UUID postId) {
         PostDTO post = postService.getPostById(postId);
 
@@ -49,6 +54,7 @@ public class PostController {
     }
 
     @PostMapping
+    @Operation(summary = "Create a new post", description = "Create a new blog post with the provided details")
     public ResponseEntity<AuthResponse<PostDTO>> createPost(@Valid @RequestBody CreatePostRequest request) {
         AuthResponse<PostDTO> response = new AuthResponse<>();
         response.setSuccess(true);
@@ -59,6 +65,7 @@ public class PostController {
 
     @PutMapping("/{postId}")
     @PreAuthorize("@securityService.isPostAuthor(#postId)")
+    @Operation(summary = "Update an existing post", description = "Update the details of an existing blog post. Only the author of the post can perform this operation.")
     public ResponseEntity<AuthResponse<PostDTO>> updatePost(@PathVariable UUID postId, @Valid @RequestBody UpdatePostRequest request) {
         PostDTO updatedPost = postService.updatePost(postId, request);
 
@@ -71,6 +78,7 @@ public class PostController {
 
     @DeleteMapping("/{postId}")
     @PreAuthorize("@securityService.canDeletePost(#postId)")
+    @Operation(summary = "Delete a post", description = "Delete an existing blog post. Only the author of the post or an admin can perform this operation.")
     public ResponseEntity<AuthResponse<Void>> deletePost(@PathVariable UUID postId) {
         postService.deletePost(postId);
 
@@ -82,6 +90,7 @@ public class PostController {
     }
 
     @GetMapping("/author/{authorId}")
+    @Operation(summary = "Get posts by author", description = "Retrieve a paginated list of blog posts created by a specific author")
     public ResponseEntity<AuthResponse<Page<PostDTO>>> getPostsByAuthor(
             @PathVariable UUID authorId,
             @RequestParam(defaultValue = "0") int page,
@@ -97,6 +106,7 @@ public class PostController {
     }
 
     @GetMapping("/search")
+    @Operation(summary = "Search posts by keyword", description = "Search for blog posts that contain the specified keyword in the title or content")
     public ResponseEntity<AuthResponse<Page<PostDTO>>> searchPosts(
             @RequestParam String keyword,
             @RequestParam(defaultValue = "0") int page,
@@ -113,6 +123,7 @@ public class PostController {
 
     @PostMapping("/{postId}/publish")
     @PreAuthorize("@securityService.isPostAuthor(#postId)")
+    @Operation(summary = "Publish a post", description = "Publish a blog post, making it visible to the public. Only the author of the post can perform this operation.")
     public ResponseEntity<AuthResponse<PostDTO>> publishPost(@PathVariable UUID postId) {
         PostDTO publishedPost = postService.publishPost(postId);
 
@@ -125,6 +136,7 @@ public class PostController {
 
     @PostMapping("/{postId}/unpublish")
     @PreAuthorize("@securityService.isPostAuthor(#postId)")
+    @Operation(summary = "Unpublish a post", description = "Unpublish a blog post, making it invisible to the public. Only the author of the post can perform this operation.")
     public ResponseEntity<AuthResponse<PostDTO>> unpublishPost(@PathVariable UUID postId) {
         PostDTO unpublishedPost = postService.unpublishPost(postId);
 

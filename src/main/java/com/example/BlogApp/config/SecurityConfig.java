@@ -55,7 +55,14 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .httpBasic(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/users/register", "/api/users/login", "/api/auth/register", "/api/auth/login").permitAll()
+                        .requestMatchers(
+                                "/api/auth/register",
+                                "/api/auth/login",
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",        // all Swagger UI static resources
+                                "/v3/api-docs",          // OpenAPI JSON (default path)
+                                "/v3/api-docs/**"       // OpenAPI sub-paths (e.g. /v3/api-docs/swagger-config)
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception

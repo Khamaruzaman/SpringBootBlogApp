@@ -1,6 +1,7 @@
 package com.example.BlogApp.DTO.authDTO;
 
 import com.example.BlogApp.utils.FieldsValueMatch;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -11,6 +12,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @FieldsValueMatch(field = "password", fieldMatch = "confirmPassword", message = "Passwords do not match!")
+@Schema(description = "Register request payload containing username and password")
 public class RegisterRequest {
     @NotBlank(message = "Username cannot be empty")
     @Pattern(regexp = "^[a-zA-Z0-9_]{5,15}$",

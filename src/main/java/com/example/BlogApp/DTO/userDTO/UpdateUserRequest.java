@@ -1,6 +1,7 @@
 package com.example.BlogApp.DTO.userDTO;
 
 import com.example.BlogApp.utils.FieldsValueMatch;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -13,6 +14,7 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 @FieldsValueMatch(field = "password", fieldMatch = "confirmPassword", message = "Passwords do not match!")
+@Schema(description = "Request object for updating user information")
 public class UpdateUserRequest {
     @NotBlank(message = "Username cannot be empty")
     @Pattern(regexp = "^[a-zA-Z0-9_]{5,15}$",

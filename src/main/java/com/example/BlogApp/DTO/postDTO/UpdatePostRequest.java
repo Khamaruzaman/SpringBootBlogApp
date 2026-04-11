@@ -1,5 +1,6 @@
 package com.example.BlogApp.DTO.postDTO;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -12,6 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Schema(description = "Request object for updating an existing blog post")
 public class UpdatePostRequest {
     private UUID id;
     @NotBlank(message = "Title is required")

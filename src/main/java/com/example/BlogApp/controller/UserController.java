@@ -4,6 +4,8 @@ import com.example.BlogApp.DTO.AuthResponse;
 import com.example.BlogApp.DTO.userDTO.UpdateUserRequest;
 import com.example.BlogApp.DTO.userDTO.UserDTO;
 import com.example.BlogApp.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,11 +19,13 @@ import java.util.UUID;
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/users")
+@Tag(name = "User Management", description = "Endpoints for managing users")
 public class UserController {
     UserService userService;
 
     @GetMapping
     @PreAuthorize("hasAuthority('ADMIN')")
+    @Operation(summary = "Get All Users", description = "Retrieve a list of all users. Accessible only by admins.")
     public ResponseEntity<AuthResponse<List<UserDTO>>> getAllUsers() {
         AuthResponse<List<UserDTO>> response = new AuthResponse<>();
         response.setSuccess(true);
@@ -32,6 +36,7 @@ public class UserController {
 
     @GetMapping("/{userId}")
     @PreAuthorize("hasAuthority('ADMIN') or #userId == authentication.principal.user.id")
+    @Operation(summary = "Get User by ID", description = "Retrieve user details by user ID. Accessible by admins or the user themselves.")
     public ResponseEntity<AuthResponse<UserDTO>> getUserById(@PathVariable UUID userId) {
         AuthResponse<UserDTO> response = new AuthResponse<>();
         response.setSuccess(true);
@@ -42,6 +47,7 @@ public class UserController {
 
     @GetMapping("/username/{username}")
     @PreAuthorize("hasAuthority('ADMIN') or #username == authentication.principal.user.username")
+    @Operation(summary = "Get User by Username", description = "Retrieve user details by username. Accessible by admins or the user themselves.")
     public ResponseEntity<AuthResponse<UserDTO>> getUserByUsername(@PathVariable String username) {
         AuthResponse<UserDTO> response = new AuthResponse<>();
         response.setSuccess(true);
@@ -52,6 +58,7 @@ public class UserController {
 
     @PutMapping("/{userId}")
     @PreAuthorize("hasAuthority('ADMIN') or #userId == authentication.principal.user.id")
+    @Operation(summary = "Update User Profile", description = "Update user profile information. Accessible by admins or the user themselves.")
     public ResponseEntity<AuthResponse<UserDTO>> updateUserProfile(@PathVariable UUID userId, @Valid @RequestBody UpdateUserRequest request) {
         AuthResponse<UserDTO> response = new AuthResponse<>();
         response.setSuccess(true);
@@ -62,6 +69,7 @@ public class UserController {
 
     @DeleteMapping("/{userId}")
     @PreAuthorize("hasAuthority('ADMIN') or #userId == authentication.principal.user.id")
+    @Operation(summary = "Delete User", description = "Delete a user account. Accessible by admins or the user themselves.")
     public ResponseEntity<AuthResponse<Void>> deleteUser(@PathVariable UUID userId) {
         userService.deleteUser(userId);
         AuthResponse<Void> response = new AuthResponse<>();
