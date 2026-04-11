@@ -6,6 +6,7 @@ import com.example.BlogApp.security.MyUserDetailsService;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -24,6 +25,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
+import static org.springframework.data.web.config.EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO;
+
 /**
  * Security Configuration for JWT-based stateless authentication.
  * <p>
@@ -38,6 +41,7 @@ import java.util.List;
 @EnableWebSecurity
 @EnableMethodSecurity
 @AllArgsConstructor
+@EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO)
 public class SecurityConfig {
 
     private JwtFilter jwtFilter;
