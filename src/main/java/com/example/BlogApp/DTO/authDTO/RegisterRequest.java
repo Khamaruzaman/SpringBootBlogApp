@@ -1,11 +1,11 @@
 package com.example.BlogApp.DTO.authDTO;
 
 import com.example.BlogApp.utils.FieldsValueMatch;
+import com.example.BlogApp.utils.StrongPassword;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,7 +24,7 @@ public class RegisterRequest {
     private String email;
 
     @NotBlank(message = "Password is required")
-    @Size(min = 8, message = "Password must be at least 8 characters")
+    @StrongPassword
     private String password;
 
     @NotBlank(message = "Please confirm your password")
