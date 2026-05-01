@@ -108,7 +108,7 @@ public class PostController {
     @GetMapping("/search")
     @Operation(summary = "Search posts by keyword", description = "Search for blog posts that contain the specified keyword in the title or content")
     public ResponseEntity<AuthResponse<Page<PostDTO>>> searchPosts(
-            @RequestParam String keyword,
+            @RequestParam(defaultValue = "") String keyword,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
