@@ -7,7 +7,7 @@ import com.example.BlogApp.DTO.userDTO.UserDTO;
 import com.example.BlogApp.exception.GlobalExceptionHandler;
 import com.example.BlogApp.exception.ResourceNotFoundException;
 import com.example.BlogApp.service.PostService;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.example.BlogApp.utils.TestUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -47,8 +47,6 @@ class PostControllerTest {
     @InjectMocks
     private PostController postController;
 
-    private ObjectMapper objectMapper;
-
     private PostDTO testPostDTO;
     private CreatePostRequest createPostRequest;
     private UpdatePostRequest updatePostRequest;
@@ -58,12 +56,12 @@ class PostControllerTest {
     private Pageable pageable;
 
     @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(postController)
-                .setControllerAdvice(new GlobalExceptionHandler())
-                .build();
-        objectMapper = new ObjectMapper();
+    void setUp() throws Exception {
+        try (@SuppressWarnings("unused") var autoCloseable = MockitoAnnotations.openMocks(this)) {
+            mockMvc = MockMvcBuilders.standaloneSetup(postController)
+                    .setControllerAdvice(new GlobalExceptionHandler())
+                    .build();
+        }
 
         postId = UUID.randomUUID();
         authorId = UUID.randomUUID();
@@ -111,7 +109,7 @@ class PostControllerTest {
     @DisplayName("Should get all posts successfully")
     void testGetAllPostsSuccess() throws Exception {
         // Arrange
-        List<PostDTO> postList = Arrays.asList(testPostDTO);
+        List<PostDTO> postList = List.of(testPostDTO);
         Page<PostDTO> page = new PageImpl<>(postList, pageable, 1);
         when(postService.getAllPosts(any())).thenReturn(page);
 
@@ -198,7 +196,7 @@ class PostControllerTest {
         // Act & Assert
         mockMvc.perform(post("/api/posts")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(createPostRequest)))
+                .content(TestUtil.asJsonString(createPostRequest)))
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.success").value(true))
@@ -221,7 +219,7 @@ class PostControllerTest {
         // Act & Assert
         mockMvc.perform(post("/api/posts")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(invalidRequest)))
+                .content(TestUtil.asJsonString(invalidRequest)))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
 
@@ -240,7 +238,7 @@ class PostControllerTest {
         // Act & Assert
         mockMvc.perform(post("/api/posts")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(invalidRequest)))
+                .content(TestUtil.asJsonString(invalidRequest)))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
 
@@ -275,7 +273,7 @@ class PostControllerTest {
         // Act & Assert
         mockMvc.perform(put("/api/posts/{postId}", postId)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(updatePostRequest)))
+                .content(TestUtil.asJsonString(updatePostRequest)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
@@ -297,7 +295,7 @@ class PostControllerTest {
         // Act & Assert
         mockMvc.perform(put("/api/posts/{postId}", postId)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(invalidRequest)))
+                .content(TestUtil.asJsonString(invalidRequest)))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
 
@@ -346,7 +344,7 @@ class PostControllerTest {
     @DisplayName("Should get posts by author successfully")
     void testGetPostsByAuthorSuccess() throws Exception {
         // Arrange
-        List<PostDTO> authorPosts = Arrays.asList(testPostDTO);
+        List<PostDTO> authorPosts = List.of(testPostDTO);
         Page<PostDTO> page = new PageImpl<>(authorPosts, pageable, 1);
         when(postService.getPostsByAuthor(eq(authorId), any())).thenReturn(page);
 
@@ -389,7 +387,7 @@ class PostControllerTest {
     void testSearchPostsSuccess() throws Exception {
         // Arrange
         String keyword = "Spring";
-        List<PostDTO> searchResults = Arrays.asList(testPostDTO);
+        List<PostDTO> searchResults = List.of(testPostDTO);
         Page<PostDTO> page = new PageImpl<>(searchResults, pageable, 1);
         when(postService.searchPosts(eq(keyword), any())).thenReturn(page);
 
