@@ -1,6 +1,6 @@
 package com.example.BlogApp.DTO.userDTO;
 
-import com.example.BlogApp.utils.FieldsValueMatch;
+import com.example.BlogApp.utils.fieldValidators.FieldsValueMatch;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

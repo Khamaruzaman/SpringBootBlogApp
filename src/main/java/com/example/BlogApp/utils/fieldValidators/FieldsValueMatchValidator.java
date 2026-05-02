@@ -1,4 +1,4 @@
-package com.example.BlogApp.utils;
+package com.example.BlogApp.utils.fieldValidators;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
