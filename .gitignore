@@ -33,3 +33,4 @@ build/
 .vscode/
 
 WORKFLOW.md
+copilet task doc/*
