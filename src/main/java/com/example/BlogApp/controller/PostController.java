@@ -30,7 +30,8 @@ public class PostController {
     @Operation(summary = "Get all posts with pagination", description = "Retrieve a paginated list of all blog posts")
     public ResponseEntity<AuthResponse<Page<PostDTO>>> getAllPosts(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size
+    ) {
         Pageable pageable = PageRequest.of(page, size);
         Page<PostDTO> posts = postService.getAllPosts(pageable);
 
@@ -66,7 +67,10 @@ public class PostController {
     @PutMapping("/{postId}")
     @PreAuthorize("@securityService.isPostAuthor(#postId)")
     @Operation(summary = "Update an existing post", description = "Update the details of an existing blog post. Only the author of the post can perform this operation.")
-    public ResponseEntity<AuthResponse<PostDTO>> updatePost(@PathVariable UUID postId, @Valid @RequestBody UpdatePostRequest request) {
+    public ResponseEntity<AuthResponse<PostDTO>> updatePost(
+            @PathVariable UUID postId,
+            @Valid @RequestBody UpdatePostRequest request
+    ) {
         PostDTO updatedPost = postService.updatePost(postId, request);
 
         AuthResponse<PostDTO> response = new AuthResponse<>();

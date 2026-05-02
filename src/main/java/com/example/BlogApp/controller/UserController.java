@@ -59,7 +59,10 @@ public class UserController {
     @PutMapping("/{userId}")
     @PreAuthorize("hasAuthority('ADMIN') or #userId == authentication.principal.user.id")
     @Operation(summary = "Update User Profile", description = "Update user profile information. Accessible by admins or the user themselves.")
-    public ResponseEntity<AuthResponse<UserDTO>> updateUserProfile(@PathVariable UUID userId, @Valid @RequestBody UpdateUserRequest request) {
+    public ResponseEntity<AuthResponse<UserDTO>> updateUserProfile(
+            @PathVariable UUID userId,
+            @Valid @RequestBody UpdateUserRequest request
+    ) {
         AuthResponse<UserDTO> response = new AuthResponse<>();
         response.setSuccess(true);
         response.setMessage("User profile updated successfully");

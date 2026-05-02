@@ -24,7 +24,10 @@ public class CommentController {
 
     @PostMapping("/posts/{postId}/comments")
     @Operation(summary = "Add a comment to a post", description = "Adds a new comment to the specified post.")
-    public ResponseEntity<AuthResponse<CommentDTO>> addComment(@PathVariable UUID postId, @RequestBody CreateCommentRequest request) {
+    public ResponseEntity<AuthResponse<CommentDTO>> addComment(
+            @PathVariable UUID postId,
+            @RequestBody CreateCommentRequest request
+    ) {
         // Set postId in request
         request.setPostId(postId);
 
@@ -52,7 +55,10 @@ public class CommentController {
     @PutMapping("/comments/{commentId}")
     @PreAuthorize("@securityService.isCommentAuthor(#commentId)")
     @Operation(summary = "Update a comment", description = "Updates the content of an existing comment. Only the author of the comment can perform this action.")
-    public ResponseEntity<AuthResponse<CommentDTO>> updateComment(@PathVariable UUID commentId, @RequestBody CreateCommentRequest request) {
+    public ResponseEntity<AuthResponse<CommentDTO>> updateComment(
+            @PathVariable UUID commentId,
+            @RequestBody CreateCommentRequest request
+    ) {
         CommentDTO updatedComment = commentService.updateComment(commentId, request);
 
         AuthResponse<CommentDTO> response = new AuthResponse<>();
