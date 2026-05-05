@@ -6,6 +6,7 @@ import com.example.BlogApp.DTO.commentDTO.CreateCommentRequest;
 import com.example.BlogApp.service.CommentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,7 @@ public class CommentController {
     @Operation(summary = "Add a comment to a post", description = "Adds a new comment to the specified post.")
     public ResponseEntity<AuthResponse<CommentDTO>> addComment(
             @PathVariable UUID postId,
-            @RequestBody CreateCommentRequest request
+            @RequestBody @Valid CreateCommentRequest request
     ) {
         // Set postId in request
         request.setPostId(postId);
@@ -57,7 +58,7 @@ public class CommentController {
     @Operation(summary = "Update a comment", description = "Updates the content of an existing comment. Only the author of the comment can perform this action.")
     public ResponseEntity<AuthResponse<CommentDTO>> updateComment(
             @PathVariable UUID commentId,
-            @RequestBody CreateCommentRequest request
+            @RequestBody @Valid CreateCommentRequest request
     ) {
         CommentDTO updatedComment = commentService.updateComment(commentId, request);
 
