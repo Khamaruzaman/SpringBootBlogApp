@@ -553,6 +553,8 @@ class PostControllerTest {
                 .param("size", "10")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
+
+        verify(postService, never()).getAllPosts(any());
     }
 
     @Test
