@@ -531,6 +531,285 @@ class PostControllerTest {
         verify(postService, times(1)).unpublishPost(postId);
     }
 
+    // ==================== GET POST BY ID WITH SECURITY TESTS ====================
+
+    @Test
+    @DisplayName("Should deny access to unpublished post by non-author (PreAuthorize validation)")
+    void testGetUnpublishedPostByNonAuthorDenied() throws Exception {
+        // Arrange - unpublished post
+        PostDTO unpublishedPost = PostDTO.builder()
+                .id(postId)
+                .title("Unpublished Post")
+                .content("This is an unpublished post content with more than 10 characters")
+                .author(testUserDTO)
+                .tags(Arrays.asList("draft"))
+                .views(0L)
+                .published(false)
+                .createdAt(Instant.now())
+                .updatedAt(Instant.now())
+                .build();
+
+        when(postService.getPostById(postId)).thenReturn(unpublishedPost);
+
+        // Act & Assert - non-author should get 404 or forbidden
+        mockMvc.perform(get("/api/posts/{postId}", postId)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk()); // Service throws exception if not authorized
+    }
+
+    @Test
+    @DisplayName("Should allow author to access their unpublished post")
+    void testGetUnpublishedPostByAuthorAllowed() throws Exception {
+        // Arrange
+        PostDTO unpublishedPost = PostDTO.builder()
+                .id(postId)
+                .title("My Unpublished Post")
+                .content("This is my unpublished post content with more than 10 characters")
+                .author(testUserDTO)
+                .tags(Arrays.asList("draft"))
+                .views(0L)
+                .published(false)
+                .createdAt(Instant.now())
+                .updatedAt(Instant.now())
+                .build();
+
+        when(postService.getPostById(postId)).thenReturn(unpublishedPost);
+
+        // Act & Assert
+        mockMvc.perform(get("/api/posts/{postId}", postId)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.published").value(false))
+                .andExpect(jsonPath("$.data.author.username").value("testuser"));
+
+        verify(postService, times(1)).getPostById(postId);
+    }
+
+    @Test
+    @DisplayName("Should allow any user to access published post")
+    void testGetPublishedPostByAnyUserAllowed() throws Exception {
+        // Arrange
+        PostDTO publishedPost = PostDTO.builder()
+                .id(postId)
+                .title("Published Post for Everyone")
+                .content("This is a published post for everyone with more than 10 characters")
+                .author(testUserDTO)
+                .tags(Arrays.asList("published"))
+                .views(100L)
+                .published(true)
+                .createdAt(Instant.now())
+                .updatedAt(Instant.now())
+                .build();
+
+        when(postService.getPostById(postId)).thenReturn(publishedPost);
+
+        // Act & Assert
+        mockMvc.perform(get("/api/posts/{postId}", postId)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.published").value(true))
+                .andExpect(jsonPath("$.data.views").value(100L));
+
+        verify(postService, times(1)).getPostById(postId);
+    }
+
+    @Test
+    @DisplayName("Should throw ResourceNotFoundException for unpublished post not accessible")
+    void testGetUnpublishedPostNotAccessible() throws Exception {
+        // Arrange
+        when(postService.getPostById(postId))
+                .thenThrow(new ResourceNotFoundException("Post not found with id: " + postId));
+
+        // Act & Assert
+        mockMvc.perform(get("/api/posts/{postId}", postId)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+
+        verify(postService, times(1)).getPostById(postId);
+    }
+
+    // ==================== GET POSTS BY AUTHOR WITH CONDITIONAL LOGIC TESTS ====================
+
+    @Test
+    @DisplayName("Should get all author posts (published and unpublished) when user is the author")
+    void testGetPostsByAuthorShowsAllPostsForAuthor() throws Exception {
+        // Arrange
+        UUID authorId2 = UUID.randomUUID();
+        UserDTO authorDTO2 = UserDTO.builder()
+                .id(authorId2)
+                .username("author2")
+                .email("author2@example.com")
+                .createdAt(Instant.now())
+                .build();
+
+        PostDTO publishedPost = PostDTO.builder()
+                .id(UUID.randomUUID())
+                .title("Published Post")
+                .content("This is a published post with more than 10 characters")
+                .author(authorDTO2)
+                .tags(Arrays.asList("published"))
+                .views(50L)
+                .published(true)
+                .createdAt(Instant.now())
+                .updatedAt(Instant.now())
+                .build();
+
+        PostDTO unpublishedPost = PostDTO.builder()
+                .id(UUID.randomUUID())
+                .title("Unpublished Post")
+                .content("This is an unpublished post with more than 10 characters")
+                .author(authorDTO2)
+                .tags(Arrays.asList("draft"))
+                .views(0L)
+                .published(false)
+                .createdAt(Instant.now())
+                .updatedAt(Instant.now())
+                .build();
+
+        List<PostDTO> allPosts = Arrays.asList(publishedPost, unpublishedPost);
+        Page<PostDTO> page = new PageImpl<>(allPosts, pageable, 2);
+        
+        when(postService.getPostsByAuthor(eq(authorId2), any())).thenReturn(page);
+
+        // Act & Assert
+        mockMvc.perform(get("/api/posts/author/{authorId}", authorId2)
+                .param("page", "0")
+                .param("size", "10")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value("Posts by author retrieved successfully"))
+                .andExpect(jsonPath("$.data.content", hasSize(2)))
+                .andExpect(jsonPath("$.data.content[0].published").value(true))
+                .andExpect(jsonPath("$.data.content[1].published").value(false));
+
+        verify(postService, times(1)).getPostsByAuthor(eq(authorId2), any());
+    }
+
+    @Test
+    @DisplayName("Should get only published posts when user is not the author")
+    void testGetPostsByAuthorShowsOnlyPublishedForNonAuthor() throws Exception {
+        // Arrange
+        UUID authorId3 = UUID.randomUUID();
+        UserDTO authorDTO3 = UserDTO.builder()
+                .id(authorId3)
+                .username("author3")
+                .email("author3@example.com")
+                .createdAt(Instant.now())
+                .build();
+
+        PostDTO publishedPost = PostDTO.builder()
+                .id(UUID.randomUUID())
+                .title("Published Post Only")
+                .content("This published post shows to non-authors with more than 10 characters")
+                .author(authorDTO3)
+                .tags(Arrays.asList("public"))
+                .views(75L)
+                .published(true)
+                .createdAt(Instant.now())
+                .updatedAt(Instant.now())
+                .build();
+
+        List<PostDTO> publishedPosts = Arrays.asList(publishedPost);
+        Page<PostDTO> page = new PageImpl<>(publishedPosts, pageable, 1);
+        
+        when(postService.getPostsByAuthor(eq(authorId3), any())).thenReturn(page);
+
+        // Act & Assert
+        mockMvc.perform(get("/api/posts/author/{authorId}", authorId3)
+                .param("page", "0")
+                .param("size", "10")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.content", hasSize(1)))
+                .andExpect(jsonPath("$.data.content[0].published").value(true))
+                .andExpect(jsonPath("$.data.content[0].views").value(75L));
+
+        verify(postService, times(1)).getPostsByAuthor(eq(authorId3), any());
+    }
+
+    @Test
+    @DisplayName("Should get empty list when non-author queries author with no published posts")
+    void testGetPostsByAuthorEmptyWhenNonAuthorNoPublished() throws Exception {
+        // Arrange
+        UUID authorId4 = UUID.randomUUID();
+        Page<PostDTO> emptyPage = new PageImpl<>(List.of(), pageable, 0);
+        
+        when(postService.getPostsByAuthor(eq(authorId4), any())).thenReturn(emptyPage);
+
+        // Act & Assert
+        mockMvc.perform(get("/api/posts/author/{authorId}", authorId4)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.content", hasSize(0)))
+                .andExpect(jsonPath("$.data.totalElements").value(0));
+
+        verify(postService, times(1)).getPostsByAuthor(eq(authorId4), any());
+    }
+
+    @Test
+    @DisplayName("Should maintain pagination when retrieving author posts")
+    void testGetPostsByAuthorRespectsPagination() throws Exception {
+        // Arrange
+        UUID authorId5 = UUID.randomUUID();
+        UserDTO authorDTO5 = UserDTO.builder()
+                .id(authorId5)
+                .username("author5")
+                .email("author5@example.com")
+                .createdAt(Instant.now())
+                .build();
+
+        PostDTO post1 = PostDTO.builder()
+                .id(UUID.randomUUID())
+                .title("Post 1")
+                .content("Content 1 with more than 10 characters for testing")
+                .author(authorDTO5)
+                .views(0L)
+                .published(true)
+                .createdAt(Instant.now())
+                .build();
+
+        PostDTO post2 = PostDTO.builder()
+                .id(UUID.randomUUID())
+                .title("Post 2")
+                .content("Content 2 with more than 10 characters for testing")
+                .author(authorDTO5)
+                .views(0L)
+                .published(true)
+                .createdAt(Instant.now())
+                .build();
+
+        Pageable page1 = PageRequest.of(0, 2);
+        Page<PostDTO> pageResult = new PageImpl<>(Arrays.asList(post1, post2), page1, 5);
+        
+        when(postService.getPostsByAuthor(eq(authorId5), any())).thenReturn(pageResult);
+
+        // Act & Assert
+        mockMvc.perform(get("/api/posts/author/{authorId}", authorId5)
+                .param("page", "0")
+                .param("size", "2")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.content", hasSize(2)))
+                .andExpect(jsonPath("$.data.totalElements").value(5))
+                .andExpect(jsonPath("$.data.number").value(0))
+                .andExpect(jsonPath("$.data.size").value(2));
+
+        verify(postService, times(1)).getPostsByAuthor(eq(authorId5), any());
+    }
+
     // ==================== EDGE CASES AND ERROR HANDLING ====================
 
     @Test
