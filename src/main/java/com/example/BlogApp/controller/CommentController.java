@@ -34,10 +34,11 @@ public class CommentController {
 
         CommentDTO comment = commentService.addComment(request);
 
-        AuthResponse<CommentDTO> response = new AuthResponse<>();
-        response.setData(comment);
-        response.setSuccess(true);
-        response.setMessage("Comment added successfully");
+        AuthResponse<CommentDTO> response = AuthResponse.<CommentDTO>builder()
+                .data(comment)
+                .success(true)
+                .message("Comment added successfully")
+                .build();
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -46,10 +47,11 @@ public class CommentController {
     public ResponseEntity<AuthResponse<List<CommentDTO>>> getCommentsByPost(@PathVariable UUID postId) {
             List<CommentDTO> comments = commentService.getCommentsByPost(postId);
 
-            AuthResponse<List<CommentDTO>> response = new AuthResponse<>();
-            response.setData(comments);
-            response.setSuccess(true);
-            response.setMessage("Comments retrieved successfully");
+            AuthResponse<List<CommentDTO>> response = AuthResponse.<List<CommentDTO>>builder()
+                    .data(comments)
+                    .success(true)
+                    .message("Comments retrieved successfully")
+                    .build();
             return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -62,10 +64,11 @@ public class CommentController {
     ) {
         CommentDTO updatedComment = commentService.updateComment(commentId, request);
 
-        AuthResponse<CommentDTO> response = new AuthResponse<>();
-        response.setData(updatedComment);
-        response.setSuccess(true);
-        response.setMessage("Comment updated successfully");
+        AuthResponse<CommentDTO> response = AuthResponse.<CommentDTO>builder()
+                .data(updatedComment)
+                .success(true)
+                .message("Comment updated successfully")
+                .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -75,10 +78,11 @@ public class CommentController {
     public ResponseEntity<AuthResponse<Void>> deleteComment(@PathVariable UUID commentId) {
         commentService.deleteComment(commentId);
 
-        AuthResponse<Void> response = new AuthResponse<>();
-        response.setSuccess(true);
-        response.setMessage("Comment deleted successfully");
-        response.setData(null);
+        AuthResponse<Void> response = AuthResponse.<Void>builder()
+                .success(true)
+                .message("Comment deleted successfully")
+                .data(null)
+                .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

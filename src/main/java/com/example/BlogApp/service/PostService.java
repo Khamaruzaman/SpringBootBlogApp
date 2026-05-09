@@ -185,16 +185,17 @@ public class PostService {
     private PostDTO mapPostToDTO(Post post) {
         UserDTO authorDTO = userService.getUserById(post.getAuthorId());
 
-        PostDTO postDTO = new PostDTO();
-        postDTO.setId(post.getId());
-        postDTO.setTitle(post.getTitle());
-        postDTO.setContent(post.getContent());
-        postDTO.setAuthor(authorDTO);
-        postDTO.setTags(post.getTags());
-        postDTO.setViews(post.getViews());
-        postDTO.setCreatedAt(post.getCreatedAt());
-        postDTO.setUpdatedAt(post.getUpdatedAt());
-        return postDTO;
+        return PostDTO.builder()
+                .id(post.getId())
+                .title(post.getTitle())
+                .content(post.getContent())
+                .author(authorDTO)
+                .tags(post.getTags())
+                .views(post.getViews())
+                .published(post.isPublished())
+                .createdAt(post.getCreatedAt())
+                .updatedAt(post.getUpdatedAt())
+                .build();
     }
 
     private String getCurrentUsername() {

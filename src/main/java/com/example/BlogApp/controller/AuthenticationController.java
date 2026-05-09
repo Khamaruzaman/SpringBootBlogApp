@@ -50,15 +50,17 @@ public class AuthenticationController {
         User savedUser = authenticationService.saveUser(registerRequest);
 
         // Generate JWT token for the newly registered user
-        JwtAuthenticationResponse jwtResponse = new JwtAuthenticationResponse();
-        jwtResponse.setAccessToken(authenticationService.generateTokenForUser(savedUser.getUsername()));
-        jwtResponse.setUsername(savedUser.getUsername());
-        jwtResponse.setTokenType("Bearer");
+        JwtAuthenticationResponse jwtResponse = JwtAuthenticationResponse.builder()
+                .accessToken(authenticationService.generateTokenForUser(savedUser.getUsername()))
+                .username(savedUser.getUsername())
+                .tokenType("Bearer")
+                .build();
 
-        AuthResponse<JwtAuthenticationResponse> response = new AuthResponse<>();
-        response.setSuccess(true);
-        response.setMessage("User registered successfully");
-        response.setData(jwtResponse);
+        AuthResponse<JwtAuthenticationResponse> response = AuthResponse.<JwtAuthenticationResponse>builder()
+                .success(true)
+                .message("User registered successfully")
+                .data(jwtResponse)
+                .build();
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -77,15 +79,17 @@ public class AuthenticationController {
             @Valid @RequestBody LoginRequest loginRequest) {
         String token = authenticationService.verifyUser(loginRequest);
 
-        JwtAuthenticationResponse jwtResponse = new JwtAuthenticationResponse();
-        jwtResponse.setAccessToken(token);
-        jwtResponse.setUsername(loginRequest.getUsername());
-        jwtResponse.setTokenType("Bearer");
+        JwtAuthenticationResponse jwtResponse = JwtAuthenticationResponse.builder()
+                .accessToken(token)
+                .username(loginRequest.getUsername())
+                .tokenType("Bearer")
+                .build();
 
-        AuthResponse<JwtAuthenticationResponse> response = new AuthResponse<>();
-        response.setSuccess(true);
-        response.setMessage("Login successful");
-        response.setData(jwtResponse);
+        AuthResponse<JwtAuthenticationResponse> response = AuthResponse.<JwtAuthenticationResponse>builder()
+                .success(true)
+                .message("Login successful")
+                .data(jwtResponse)
+                .build();
 
         return ResponseEntity.ok(response);
     }

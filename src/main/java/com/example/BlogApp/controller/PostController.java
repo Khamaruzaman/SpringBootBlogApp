@@ -35,10 +35,11 @@ public class PostController {
         Pageable pageable = PageRequest.of(page, size);
         Page<PostDTO> posts = postService.getAllPosts(pageable);
 
-        AuthResponse<Page<PostDTO>> response = new AuthResponse<>();
-        response.setData(posts);
-        response.setSuccess(true);
-        response.setMessage("Posts retrieved successfully");
+        AuthResponse<Page<PostDTO>> response = AuthResponse.<Page<PostDTO>>builder()
+                .data(posts)
+                .success(true)
+                .message("Posts retrieved successfully")
+                .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -48,20 +49,22 @@ public class PostController {
     public ResponseEntity<AuthResponse<PostDTO>> getPostById(@PathVariable UUID postId) {
         PostDTO post = postService.getPostById(postId);
 
-        AuthResponse<PostDTO> response = new AuthResponse<>();
-        response.setData(post);
-        response.setSuccess(true);
-        response.setMessage("Post retrieved successfully");
+        AuthResponse<PostDTO> response = AuthResponse.<PostDTO>builder()
+                .data(post)
+                .success(true)
+                .message("Post retrieved successfully")
+                .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PostMapping
     @Operation(summary = "Create a new post", description = "Create a new blog post with the provided details")
     public ResponseEntity<AuthResponse<PostDTO>> createPost(@Valid @RequestBody CreatePostRequest request) {
-        AuthResponse<PostDTO> response = new AuthResponse<>();
-        response.setSuccess(true);
-        response.setData(postService.createPost(request));
-        response.setMessage("Post created successfully");
+        AuthResponse<PostDTO> response = AuthResponse.<PostDTO>builder()
+                .success(true)
+                .data(postService.createPost(request))
+                .message("Post created successfully")
+                .build();
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -74,10 +77,11 @@ public class PostController {
     ) {
         PostDTO updatedPost = postService.updatePost(postId, request);
 
-        AuthResponse<PostDTO> response = new AuthResponse<>();
-        response.setData(updatedPost);
-        response.setSuccess(true);
-        response.setMessage("Post updated successfully");
+        AuthResponse<PostDTO> response = AuthResponse.<PostDTO>builder()
+                .data(updatedPost)
+                .success(true)
+                .message("Post updated successfully")
+                .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -87,10 +91,11 @@ public class PostController {
     public ResponseEntity<AuthResponse<Void>> deletePost(@PathVariable UUID postId) {
         postService.deletePost(postId);
 
-        AuthResponse<Void> response = new AuthResponse<>();
-        response.setSuccess(true);
-        response.setMessage("Post deleted successfully");
-        response.setData(null);
+        AuthResponse<Void> response = AuthResponse.<Void>builder()
+                .success(true)
+                .message("Post deleted successfully")
+                .data(null)
+                .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -103,10 +108,11 @@ public class PostController {
         Pageable pageable = PageRequest.of(page, size);
         Page<PostDTO> posts = postService.getPostsByAuthor(authorId, pageable);
 
-        AuthResponse<Page<PostDTO>> response = new AuthResponse<>();
-        response.setData(posts);
-        response.setSuccess(true);
-        response.setMessage("Posts by author retrieved successfully");
+        AuthResponse<Page<PostDTO>> response = AuthResponse.<Page<PostDTO>>builder()
+                .data(posts)
+                .success(true)
+                .message("Posts by author retrieved successfully")
+                .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -119,10 +125,11 @@ public class PostController {
         Pageable pageable = PageRequest.of(page, size);
         Page<PostDTO> posts = postService.searchPosts(keyword, pageable);
 
-        AuthResponse<Page<PostDTO>> response = new AuthResponse<>();
-        response.setData(posts);
-        response.setSuccess(true);
-        response.setMessage("Posts searched successfully");
+        AuthResponse<Page<PostDTO>> response = AuthResponse.<Page<PostDTO>>builder()
+                .data(posts)
+                .success(true)
+                .message("Posts searched successfully")
+                .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -132,10 +139,11 @@ public class PostController {
     public ResponseEntity<AuthResponse<PostDTO>> publishPost(@PathVariable UUID postId) {
         PostDTO publishedPost = postService.publishPost(postId);
 
-        AuthResponse<PostDTO> response = new AuthResponse<>();
-        response.setData(publishedPost);
-        response.setSuccess(true);
-        response.setMessage("Post published successfully");
+        AuthResponse<PostDTO> response = AuthResponse.<PostDTO>builder()
+                .data(publishedPost)
+                .success(true)
+                .message("Post published successfully")
+                .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -145,10 +153,11 @@ public class PostController {
     public ResponseEntity<AuthResponse<PostDTO>> unpublishPost(@PathVariable UUID postId) {
         PostDTO unpublishedPost = postService.unpublishPost(postId);
 
-        AuthResponse<PostDTO> response = new AuthResponse<>();
-        response.setData(unpublishedPost);
-        response.setSuccess(true);
-        response.setMessage("Post unpublished successfully");
+        AuthResponse<PostDTO> response = AuthResponse.<PostDTO>builder()
+                .data(unpublishedPost)
+                .success(true)
+                .message("Post unpublished successfully")
+                .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

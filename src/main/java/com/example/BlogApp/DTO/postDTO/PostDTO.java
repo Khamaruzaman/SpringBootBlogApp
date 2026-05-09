@@ -21,6 +21,7 @@ public class PostDTO {
     private UserDTO author;
     private List<String> tags;
     private long views;
+    private boolean published;
     private Instant createdAt;
     private Instant updatedAt;
 

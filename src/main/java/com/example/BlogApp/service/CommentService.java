@@ -98,13 +98,13 @@ public class CommentService {
     private CommentDTO mapCommentToDTO(Comment comment) {
         UserDTO authorDTO = userService.getUserById(comment.getAuthorId());
 
-        CommentDTO commentDTO = new CommentDTO();
-        commentDTO.setId(comment.getId());
-        commentDTO.setContent(comment.getContent());
-        commentDTO.setAuthor(authorDTO);
-        commentDTO.setPostId(comment.getPostId());
-        commentDTO.setCreatedAt(comment.getCreatedAt());
-        return commentDTO;
+        return CommentDTO.builder()
+                .id(comment.getId())
+                .content(comment.getContent())
+                .author(authorDTO)
+                .postId(comment.getPostId())
+                .createdAt(comment.getCreatedAt())
+                .build();
     }
 
     private String getCurrentUsername() {

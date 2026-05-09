@@ -27,10 +27,11 @@ public class UserController {
     @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Get All Users", description = "Retrieve a list of all users. Accessible only by admins.")
     public ResponseEntity<AuthResponse<List<UserDTO>>> getAllUsers() {
-        AuthResponse<List<UserDTO>> response = new AuthResponse<>();
-        response.setSuccess(true);
-        response.setMessage("Users retrieved successfully");
-        response.setData(userService.getAllUsers());
+        AuthResponse<List<UserDTO>> response = AuthResponse.<List<UserDTO>>builder()
+                .success(true)
+                .message("Users retrieved successfully")
+                .data(userService.getAllUsers())
+                .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -38,10 +39,11 @@ public class UserController {
     @PreAuthorize("hasAuthority('ADMIN') or #userId == authentication.principal.user.id")
     @Operation(summary = "Get User by ID", description = "Retrieve user details by user ID. Accessible by admins or the user themselves.")
     public ResponseEntity<AuthResponse<UserDTO>> getUserById(@PathVariable UUID userId) {
-        AuthResponse<UserDTO> response = new AuthResponse<>();
-        response.setSuccess(true);
-        response.setMessage("User retrieved successfully");
-        response.setData(userService.getUserById(userId));
+        AuthResponse<UserDTO> response = AuthResponse.<UserDTO>builder()
+                .success(true)
+                .message("User retrieved successfully")
+                .data(userService.getUserById(userId))
+                .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -49,10 +51,11 @@ public class UserController {
     @PreAuthorize("hasAuthority('ADMIN') or #username == authentication.principal.user.username")
     @Operation(summary = "Get User by Username", description = "Retrieve user details by username. Accessible by admins or the user themselves.")
     public ResponseEntity<AuthResponse<UserDTO>> getUserByUsername(@PathVariable String username) {
-        AuthResponse<UserDTO> response = new AuthResponse<>();
-        response.setSuccess(true);
-        response.setMessage("User retrieved successfully");
-        response.setData(userService.getUserByUsername(username));
+        AuthResponse<UserDTO> response = AuthResponse.<UserDTO>builder()
+                .success(true)
+                .message("User retrieved successfully")
+                .data(userService.getUserByUsername(username))
+                .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -63,10 +66,11 @@ public class UserController {
             @PathVariable UUID userId,
             @Valid @RequestBody UpdateUserRequest request
     ) {
-        AuthResponse<UserDTO> response = new AuthResponse<>();
-        response.setSuccess(true);
-        response.setMessage("User profile updated successfully");
-        response.setData(userService.updateUserProfile(userId, request));
+        AuthResponse<UserDTO> response = AuthResponse.<UserDTO>builder()
+                .success(true)
+                .message("User profile updated successfully")
+                .data(userService.updateUserProfile(userId, request))
+                .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -75,10 +79,11 @@ public class UserController {
     @Operation(summary = "Delete User", description = "Delete a user account. Accessible by admins or the user themselves.")
     public ResponseEntity<AuthResponse<Void>> deleteUser(@PathVariable UUID userId) {
         userService.deleteUser(userId);
-        AuthResponse<Void> response = new AuthResponse<>();
-        response.setSuccess(true);
-        response.setMessage("User deleted successfully");
-        response.setData(null);
+        AuthResponse<Void> response = AuthResponse.<Void>builder()
+                .success(true)
+                .message("User deleted successfully")
+                .data(null)
+                .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }
