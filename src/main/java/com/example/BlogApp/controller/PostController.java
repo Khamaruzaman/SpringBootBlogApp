@@ -43,6 +43,7 @@ public class PostController {
     }
 
     @GetMapping("/{postId}")
+    @PreAuthorize("@securityService.canViewUnpublishedPost(#postId)")
     @Operation(summary = "Get post by ID", description = "Retrieve a single blog post by its unique identifier")
     public ResponseEntity<AuthResponse<PostDTO>> getPostById(@PathVariable UUID postId) {
         PostDTO post = postService.getPostById(postId);

@@ -10,5 +10,6 @@ import java.util.UUID;
 public interface PostRepo extends MongoRepository<Post, UUID> {
     Page<Post> findByPublishedTrue(Pageable pageable);
     Page<Post> findByAuthorId(UUID authorId, Pageable pageable);
+    Page<Post> findByAuthorIdAndPublishedTrue(UUID authorId, Pageable pageable);
     Page<Post> findByTitleContainingOrContentContaining(String titleKeyword, String contentKeyword, Pageable pageable);
 }

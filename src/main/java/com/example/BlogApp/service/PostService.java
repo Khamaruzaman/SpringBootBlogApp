@@ -117,8 +117,19 @@ public class PostService {
 
     public Page<PostDTO> getPostsByAuthor(UUID authorId, Pageable pageable) {
         try {
-            Page<PostDTO> posts = postRepo.findByAuthorId(authorId, pageable)
-                    .map(this::mapPostToDTO);
+            String currentUsername = getCurrentUsername();
+            UserDTO currentUser = userService.getUserByUsername(currentUsername);
+
+            Page<PostDTO> posts;
+            if (currentUser.getId().equals(authorId)) {
+                // If user is the author, show all posts (published and unpublished)
+                posts = postRepo.findByAuthorId(authorId, pageable)
+                        .map(this::mapPostToDTO);
+            } else {
+                // If user is not the author, show only published posts
+                posts = postRepo.findByAuthorIdAndPublishedTrue(authorId, pageable)
+                        .map(this::mapPostToDTO);
+            }
             log.info("Retrieved {} posts by author {} (page {}, size {})", posts.getTotalElements(), authorId, pageable.getPageNumber(), pageable.getPageSize());
             return posts;
         } catch (Exception e) {

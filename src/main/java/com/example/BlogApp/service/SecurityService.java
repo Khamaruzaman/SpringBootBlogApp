@@ -71,6 +71,20 @@ public class SecurityService {
         return isCommentAuthor(commentId) || isAdmin();
     }
 
+    /**
+     * Check if current user can view an unpublished post (is author or admin)
+     */
+    public boolean canViewUnpublishedPost(UUID postId) {
+        Post post = postRepo.findById(postId)
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found with id: " + postId));
+
+        if(!post.isPublished()) {
+            UUID currentUser = getCurrentUserId();
+            return currentUser == post.getAuthorId() || isAdmin();
+        }
+        return true;
+    }
+
     private UUID getCurrentUserId() {
         String username = getCurrentUsername();
         UserDTO userDTO = userService.getUserByUsername(username);
