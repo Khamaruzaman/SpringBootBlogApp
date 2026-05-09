@@ -6,11 +6,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @FieldsValueMatch(field = "password", fieldMatch = "confirmPassword", message = "Passwords do not match!")
 @Schema(description = "Register request payload containing username and password")
 public class RegisterRequest {
