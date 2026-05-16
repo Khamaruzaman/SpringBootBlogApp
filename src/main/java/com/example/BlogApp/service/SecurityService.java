@@ -80,7 +80,7 @@ public class SecurityService {
 
         if(!post.isPublished()) {
             UUID currentUser = getCurrentUserId();
-            return currentUser == post.getAuthorId() || isAdmin();
+            return currentUser.equals(post.getAuthorId()) || isAdmin();
         }
         return true;
     }

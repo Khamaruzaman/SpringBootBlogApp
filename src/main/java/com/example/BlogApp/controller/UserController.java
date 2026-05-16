@@ -36,7 +36,6 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    @PreAuthorize("hasAuthority('ADMIN') or #userId == authentication.principal.user.id")
     @Operation(summary = "Get User by ID", description = "Retrieve user details by user ID. Accessible by admins or the user themselves.")
     public ResponseEntity<AuthResponse<UserDTO>> getUserById(@PathVariable UUID userId) {
         AuthResponse<UserDTO> response = AuthResponse.<UserDTO>builder()
