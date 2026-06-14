@@ -1,0 +1,8 @@
+target/
+build/
+.git/
+.mvn/
+.gradle/
+.idea/
+*.iml
+Dockerfile

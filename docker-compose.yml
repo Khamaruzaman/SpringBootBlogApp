@@ -1,0 +1,51 @@
+services:
+  mongodb:
+    image: mongo:8.3.4
+    container_name: blogapp-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - blogapp-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  blogapp:
+    build: .
+    container_name: blogapp
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      MONGODB_HOST: mongodb
+      MONGODB_PORT: 27017
+      MONGODB_DATABASE: BlogApp
+      MONGODB_USERNAME: admin
+      MONGODB_PASSWORD: password
+      MONGODB_AUTH_DB: admin
+      JWT_SECRET: your-secret-key-change-in-production
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - blogapp-network
+    healthcheck:
+      test: curl -f http://localhost:8080/actuator/health || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  blogapp-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
